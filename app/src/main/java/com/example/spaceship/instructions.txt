@@ -1,0 +1,30 @@
+General Idea:
+  Spaceship game, the player constantly moves left and right and has to hit all the enemy spaceships.
+  Can buy upgraded weapons in store for points.
+
+Game Mechanics:
+  Game Rules:
+    - Limited amount of misses: difficulty + 2.
+    - Timer of 10, 20, 30 seconds.
+    - 5 Difficulties: Very Easy, Easy, Normal, Hard, Very Hard.
+    - Difficulty goes up automatically every 5 levels.
+
+  Enemy Rules:
+    - 5, 10, 20, 30 HP
+    - Always static.
+
+  Point Rules:
+    - Each level gives difficulty + 3 points.
+    - Points are given only after the player loses.
+    - Points are gained from level 1.
+    - Points will not be awarded if player hasn't passed level 10.
+
+  Weapon Rules:
+    - Minimum Damage: 5 HP
+    - Maximum Damage: 25 HP
+    - Minimum Firerate: 0.2s
+    - Maximum Firerate: 2s
+    - Minimum Speed: 1 au/h
+    - Maximum Speed: 5 au/h
+    - Minimum Cost: 20 P
+    - Maximum Cost: 100 P

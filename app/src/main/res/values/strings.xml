@@ -1,0 +1,5 @@
+<resources>
+	<string name="app_name">Spaceship</string>
+	<string name="menu_start">Start Game</string>
+	<string name="menu_store">Store</string>
+</resources>

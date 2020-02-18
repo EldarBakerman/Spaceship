@@ -1,0 +1,138 @@
+package com.example.spaceship.classes;
+
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class Spaceship {
+	
+	protected Drawable image;
+	protected int hp, hpTotal;
+	protected RectF healthbar;
+	protected TextView hpText;
+	protected RelativeLayout hpLayout;
+	
+	public Spaceship () {
+		this.image     = null;
+		this.hp        = -1;
+		this.hpTotal   = -1;
+		this.healthbar = new RectF();
+	}
+	
+	public Spaceship (Drawable image) {
+		this.image     = image;
+		this.hp        = -1;
+		this.hpTotal   = -1;
+		this.healthbar = new RectF();
+		initHealthbar();
+	}
+	
+	public void initHealthbar () {
+		Rect bounds = this.image.copyBounds();
+		int width = bounds.right - bounds.left;
+		this.healthbar.set((bounds.left + (width / 2)) - 75,
+		                   bounds.bottom + 25,
+		                   (bounds.right - (width / 2)) + 75,
+		                   bounds.bottom + 50);
+	}
+	
+	public Spaceship (Drawable image, int hp) {
+		this.image     = image;
+		this.hp        = hp;
+		this.hpTotal   = hp;
+		this.healthbar = new RectF();
+		initHealthbar();
+	}
+	
+	public Spaceship (Drawable image, int hp, int hpTotal) {
+		this.image     = image;
+		this.hp        = hp;
+		this.hpTotal   = hpTotal;
+		this.healthbar = new RectF();
+		initHealthbar();
+	}
+	
+	public Spaceship (Drawable image, int hp, int hpTotal, RectF healthbar) {
+		this.image     = image;
+		this.hp        = hp;
+		this.hpTotal   = hpTotal;
+		this.healthbar = healthbar;
+	}
+	
+	public Spaceship (Drawable image, int hp, int hpTotal, RectF healthbar, TextView hpText,
+	                  RelativeLayout hpLayout) {
+		this.image     = image;
+		this.hp        = hp;
+		this.hpTotal   = hpTotal;
+		this.healthbar = healthbar;
+		this.hpText    = hpText;
+		this.hpLayout  = hpLayout;
+	}
+	
+	public Drawable getImage () {
+		return image;
+	}
+	
+	public void setImage (Drawable image) {
+		this.image = image;
+	}
+	
+	public int getHp () {
+		return hp;
+	}
+	
+	public void setHp (int hp) {
+		this.hp = hp;
+	}
+	
+	public void updateHealthbar () {
+		this.healthbar.right = this.healthbar.left +
+		                       (((float) this.hp / (float) this.hpTotal) * this.healthbar.width());
+	}
+	
+	public int getHpTotal () {
+		return hpTotal;
+	}
+	
+	public void setHpTotal (int hpTotal) {
+		this.hpTotal = hpTotal;
+	}
+	
+	public RectF getHealthbar () {
+		return healthbar;
+	}
+	
+	public void setHealthbar (RectF healthbar) {
+		this.healthbar = healthbar;
+	}
+	
+	public int reduceHP (int damage) {
+		if (hp <= damage) {
+			this.hp = 0;
+		} else
+			this.hp -= damage;
+		return this.hp;
+	}
+	
+	public String getHPString () {
+		return this.hp + "/" + this.hpTotal + " HP";
+	}
+	
+	public TextView getHpText () {
+		return hpText;
+	}
+	
+	public void setHpText (TextView hpText) {
+		this.hpText = hpText;
+	}
+	
+	public RelativeLayout getHpLayout () {
+		return hpLayout;
+	}
+	
+	public void setHpLayout (RelativeLayout hpLayout) {
+		this.hpLayout = hpLayout;
+	}
+}
