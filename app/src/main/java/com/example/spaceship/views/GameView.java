@@ -156,7 +156,7 @@ public class GameView extends View {
 		//		enemies[3].getImage().setBounds(400, 500, 600, 700);
 	}
 	
-	//TODO: Generate automatic coordinates
+	// TODO: Generate automatic coordinates
 	private void generateEnemies (int amount) {
 		enemies = new EnemySpaceship[amount];
 		for (int i = 0; i < amount; i++) {
