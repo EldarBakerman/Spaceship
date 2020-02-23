@@ -11,7 +11,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,13 +48,15 @@ public class GameView extends View {
 	Drawable dPlayer;
 	RectF hPlayer;
 	// Boolean Checkers
-	boolean start = true, timerTick = false, tapped = false, laserAnimating = false, miss = false,
-			exploding = false, lost = false;
-	int timerCount = 0;
+	boolean start = true;
+	boolean timerTick = false;
+	boolean tapped = false;
+	boolean laserAnimating = false;
+	boolean miss = false;
+	boolean lost = false;
 	EnemySpaceship[] enemies;
 	// TODO: Level & Points
 	TextView pointsText, levelText;
-	Drawable explosion;
 	private EnemySpaceship hit = null;
 	private LinearLayout infoLayout;
 	// TODO: Proportional size
@@ -64,8 +65,6 @@ public class GameView extends View {
 	private int level, points;
 	//TODO: User & Database
 	private User user;
-	//TODO: Difficulty
-	private int difficulty;
 	
 	
 	/**
@@ -168,9 +167,86 @@ public class GameView extends View {
 		}
 	}
 	
+	/**
+	 * {@link View#onDraw(Canvas) onDraw} method inherited from {@link View view} for initial run
+	 *
+	 * @param canvas canvas to draw on
+	 */
+	
+	@Override
+	protected void onDraw (Canvas canvas) {
+		super.onDraw(canvas);
+		
+		if (lost) {
+			start = timerTick = tapped = laserAnimating = miss = false;
+			loseText(canvas);
+			return;
+		}
+		
+		// TODO: Array of enemy spaceships
+		
+		// TODO: Documentation
+		
+		// Animation
+		if (start) {
+			setBackgroundColor(Color.BLACK);
+			dPlayer.setBounds(getWidth() / 2 - 150,
+			                  getHeight() - 300,
+			                  getWidth() / 2 + 150,
+			                  getHeight() - 100);
+			start = false;
+		}
+		
+		enemies[0].getImage().draw(canvas);
+		enemies[1].getImage().draw(canvas);
+		initHealthbar(canvas, enemies[0]);
+		initHealthbar(canvas, enemies[1]);
+		
+		dPlayer.draw(canvas);
+		initHealthbar(canvas, player);
+		
+		infoLayout.measure(getWidth(), getHeight());
+		infoLayout.layout(0, 0, getWidth(), getHeight());
+		infoLayout.draw(canvas);
+		
+		
+		if (timerTick) {
+			animateSpaceship(Integer.parseInt(timerText.getText().toString()) % 2 == 0);
+			timerTick = false;
+		}
+		
+		if (tapped) {
+			initLaser();
+			animateLaser();
+			tapped = false;
+		}
+		
+		if (laserAnimating) {
+			laser.draw(canvas);
+			laserAnimating = false;
+		} else if (miss) {
+			miss = false;
+			if (player.reduceHP(5) <= 0)
+				explode(player);
+		} else if (hit != null) {
+			if (hit.reduceHP(player.getWeapon().getDamage()) <= 0)
+				explode(hit);
+			hit = null;
+		}
+		
+		for (Spaceship enemy : enemies)
+			if (enemy.getExplosion() != null && !enemy.getExplosion().getBounds().isEmpty())
+				enemy.getExplosion().draw(canvas);
+		
+		if (player.getExplosion() != null && !player.getExplosion().getBounds().isEmpty())
+			player.getExplosion().draw(canvas);
+	}
+	
 	private void explode (Spaceship spaceship) {
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
+			int timerCount = 0;
+			
 			@Override
 			public void run () {
 				// TODO: Find a way to count timer without public variable or create a local
@@ -180,63 +256,17 @@ public class GameView extends View {
 					if (player.getHp() <= 0)
 						lost = true;
 					hit        = null;
-					exploding  = false;
-					timerCount = 0;
 					invalidate();
 				}
-				explode(spaceship, timerCount++);
+				
+				if (timerCount < 3)
+					spaceship.setExplosion(getRes("explosion" + timerCount), timerCount);
+				else
+					spaceship.setExplosion(timerCount);
+				timerCount++;
 			}
-		}, 0, 1000);
-	}
-	
-	private void explode (Spaceship spaceship, int stage) {
-		if (stage > 3 || spaceship == null)
-			return;
+		}, 0, 300);
 		
-		Rect bounds = spaceship.getImage().getBounds();
-		final int width = bounds.width();
-		final int height = bounds.height();
-		
-		if (stage < 3)
-			explosion = getRes("explosion" + stage);
-		
-		assert explosion != null : "explosion mustn't be null";
-		switch (stage) {
-			case 0:
-				explosion.setBounds(bounds.centerX() - (width / 4),
-				                    bounds.centerY() - (height / 4),
-				                    bounds.centerX() + (width / 4),
-				                    bounds.centerY() + height / 4);
-				break;
-			case 1:
-				explosion.setBounds(bounds.centerX() - (width / 3),
-				                    bounds.centerY() - (height / 3),
-				                    bounds.centerX() + (width / 3),
-				                    bounds.centerY() + height / 3);
-				break;
-			case 2:
-				explosion.setBounds(bounds);
-				break;
-			case 3:
-				spaceship.getImage().setBounds(0, 0, 0, 0);
-				spaceship.getHealthbar().setEmpty();
-				spaceship.getHpText().setVisibility(INVISIBLE);
-				spaceship.getHpLayout().setVisibility(INVISIBLE);
-				break;
-		}
-		exploding = true;
-		invalidate();
-		
-	}
-	
-	private Drawable getRes (String id) {
-		try {
-			Field idField = R.drawable.class.getDeclaredField(id);
-			return getResources().getDrawable(idField.getInt(idField), null);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 	
 	private void animateLaser () {
@@ -283,8 +313,6 @@ public class GameView extends View {
 			    (result == null || result.getImage().getBounds().bottom < enemyBounds.bottom))
 				result = enemy;
 		}
-		Log.d("GameView#laserTarget: ",
-		      result != null ? result.getImage().getBounds().toString() : "miss");
 		return result;
 	}
 	
@@ -403,77 +431,12 @@ public class GameView extends View {
 		return super.performClick();
 	}
 	
-	
-	/**
-	 * {@link View#onDraw(Canvas) onDraw} method inherited from {@link View view} for initial run
-	 *
-	 * @param canvas canvas to draw on
-	 */
-	
-	@Override
-	protected void onDraw (Canvas canvas) {
-		super.onDraw(canvas);
-		
-		if (lost) {
-			start = timerTick = tapped = laserAnimating = miss = exploding = false;
-			loseText(canvas);
-			return;
-		}
-		
-		// TODO: Array of enemy spaceships
-		
-		// TODO: Documentation
-		
-		// Animation
-		if (start) {
-			setBackgroundColor(Color.BLACK);
-			dPlayer.setBounds(getWidth() / 2 - 150,
-			                  getHeight() - 300,
-			                  getWidth() / 2 + 150,
-			                  getHeight() - 100);
-			start = false;
-		}
-		
-		enemies[0].getImage().draw(canvas);
-		enemies[1].getImage().draw(canvas);
-		initHealthbar(canvas, enemies[0]);
-		initHealthbar(canvas, enemies[1]);
-		
-		dPlayer.draw(canvas);
-		initHealthbar(canvas, player);
-		
-		infoLayout.measure(getWidth(), getHeight());
-		infoLayout.layout(0, 0, getWidth(), getHeight());
-		infoLayout.draw(canvas);
-		
-		
-		if (timerTick) {
-			animateSpaceship(Integer.parseInt(timerText.getText().toString()) % 2 == 0);
-			timerTick = false;
-		}
-		
-		if (tapped) {
-			initLaser();
-			animateLaser();
-			tapped = false;
-		}
-		
-		if (laserAnimating) {
-			laser.draw(canvas);
-			laserAnimating = false;
-		} else if (miss) {
-			miss = false;
-			if (player.reduceHP(5) <= 0)
-				explode(player);
-		} else if (hit != null) {
-			if (hit.reduceHP(player.getWeapon().getDamage()) <= 0)
-				explode(hit);
-			hit = null;
-		}
-		
-		if (exploding) {
-			explosion.draw(canvas);
-			exploding = false;
+	private Drawable getRes (String id) {
+		try {
+			Field idField = R.drawable.class.getDeclaredField(id);
+			return getResources().getDrawable(idField.getInt(idField), null);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			return null;
 		}
 	}
 }

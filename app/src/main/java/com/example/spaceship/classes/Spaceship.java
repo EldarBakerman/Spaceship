@@ -6,9 +6,11 @@ import android.graphics.drawable.Drawable;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import static android.view.View.INVISIBLE;
+
 public class Spaceship {
 	
-	protected Drawable image;
+	protected Drawable image, explosion;
 	protected int hp, hpTotal;
 	protected RectF healthbar;
 	protected TextView hpText;
@@ -64,6 +66,17 @@ public class Spaceship {
 	public Spaceship (Drawable image, int hp, int hpTotal, RectF healthbar, TextView hpText,
 	                  RelativeLayout hpLayout) {
 		this.image     = image;
+		this.hp        = hp;
+		this.hpTotal   = hpTotal;
+		this.healthbar = healthbar;
+		this.hpText    = hpText;
+		this.hpLayout  = hpLayout;
+	}
+	
+	public Spaceship (Drawable image, Drawable explosion, int hp, int hpTotal, RectF healthbar,
+	                  TextView hpText, RelativeLayout hpLayout) {
+		this.image     = image;
+		this.explosion = explosion;
 		this.hp        = hp;
 		this.hpTotal   = hpTotal;
 		this.healthbar = healthbar;
@@ -134,5 +147,53 @@ public class Spaceship {
 	
 	public void setHpLayout (RelativeLayout hpLayout) {
 		this.hpLayout = hpLayout;
+	}
+	
+	public Drawable getExplosion () {
+		return explosion;
+	}
+	
+	public void setExplosion (Drawable explosion) {
+		this.explosion = explosion;
+	}
+	
+	public void setExplosion (int stage) {
+		if (stage > 3 || this.explosion == null)
+			return;
+		
+		final Rect bounds = this.image.getBounds();
+		final int width = bounds.width();
+		final int height = bounds.height();
+		
+		switch (stage) {
+			case 0:
+				this.explosion.setBounds(bounds.centerX() - (width / 4),
+				                         bounds.centerY() - (height / 4),
+				                         bounds.centerX() + (width / 4),
+				                         bounds.centerY() + height / 4);
+				break;
+			case 1:
+				this.explosion.setBounds(bounds.centerX() - (width / 3),
+				                         bounds.centerY() - (height / 3),
+				                         bounds.centerX() + (width / 3),
+				                         bounds.centerY() + height / 3);
+				break;
+			case 2:
+				this.explosion.setBounds(bounds);
+				break;
+			case 3:
+				this.image.setBounds(new Rect());
+				this.explosion.setBounds(new Rect());
+				this.healthbar.setEmpty();
+				this.hpText.setText("");
+				this.hpText.setVisibility(INVISIBLE);
+				this.hpLayout.setVisibility(INVISIBLE);
+				break;
+		}
+	}
+	
+	public void setExplosion (Drawable explosion, int stage) {
+		setExplosion(explosion);
+		setExplosion(stage);
 	}
 }
