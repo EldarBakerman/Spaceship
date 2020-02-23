@@ -15,6 +15,7 @@ public class Spaceship {
 	protected RectF healthbar;
 	protected TextView hpText;
 	protected RelativeLayout hpLayout;
+	private int stage;
 	
 	public Spaceship () {
 		this.image     = null;
@@ -157,9 +158,22 @@ public class Spaceship {
 		this.explosion = explosion;
 	}
 	
+	public void updateExplosion () {
+		setExplosion(stage);
+	}
+	
+	public void setExplosion (Drawable explosion, int stage) {
+		setExplosion(explosion);
+		setExplosion(stage);
+	}
+	
 	public void setExplosion (int stage) {
-		if (stage > 3 || this.explosion == null)
+		if (stage > 3 || this.explosion == null) {
+			this.stage = -1;
 			return;
+		}
+		
+		this.stage = stage;
 		
 		final Rect bounds = this.image.getBounds();
 		final int width = bounds.width();
@@ -182,18 +196,13 @@ public class Spaceship {
 				this.explosion.setBounds(bounds);
 				break;
 			case 3:
-				this.image.setBounds(new Rect());
-				this.explosion.setBounds(new Rect());
+				this.image.setBounds(0, 0, 0, 0);
+				this.explosion.setBounds(0, 0, 0, 0);
 				this.healthbar.setEmpty();
 				this.hpText.setText("");
 				this.hpText.setVisibility(INVISIBLE);
 				this.hpLayout.setVisibility(INVISIBLE);
 				break;
 		}
-	}
-	
-	public void setExplosion (Drawable explosion, int stage) {
-		setExplosion(explosion);
-		setExplosion(stage);
 	}
 }

@@ -235,11 +235,15 @@ public class GameView extends View {
 		}
 		
 		for (Spaceship enemy : enemies)
-			if (enemy.getExplosion() != null && !enemy.getExplosion().getBounds().isEmpty())
+			if (enemy.getExplosion() != null && !enemy.getExplosion().getBounds().isEmpty()) {
+				enemy.updateExplosion();
 				enemy.getExplosion().draw(canvas);
+			}
 		
-		if (player.getExplosion() != null && !player.getExplosion().getBounds().isEmpty())
+		if (player.getExplosion() != null && !player.getExplosion().getBounds().isEmpty()) {
+			player.updateExplosion();
 			player.getExplosion().draw(canvas);
+		}
 	}
 	
 	private void explode (Spaceship spaceship) {
@@ -251,22 +255,21 @@ public class GameView extends View {
 			public void run () {
 				// TODO: Find a way to count timer without public variable or create a local
 				//  variable for every instance of timer
-				if (timerCount > 3) {
-					timer.cancel();
-					if (player.getHp() <= 0)
-						lost = true;
-					hit        = null;
-					invalidate();
-				}
 				
 				if (timerCount < 3)
 					spaceship.setExplosion(getRes("explosion" + timerCount), timerCount);
-				else
+				else {
 					spaceship.setExplosion(timerCount);
+					timer.cancel();
+					if (spaceship instanceof PlayerSpaceship)
+						lost = true;
+					hit = null;
+					invalidate();
+				}
 				timerCount++;
+				invalidate();
 			}
 		}, 0, 300);
-		
 	}
 	
 	private void animateLaser () {
