@@ -6,36 +6,35 @@ import com.example.spaceship.R;
 
 public class EnemySpaceship extends Spaceship {
 	
-	private int difficulty;
 	private int resource;
+	private int rarity;
 	
 	public EnemySpaceship () {
 		super();
-		initHealthbar();
-		this.difficulty = 1;
 	}
 	
 	public EnemySpaceship (EnemyType type) {
-		this.hp         = type.hp;
-		this.hpTotal    = type.hp;
-		this.difficulty = type.difficulty;
-		this.resource   = type.resource;
+		this.hp       = type.hp;
+		this.hpTotal  = type.hp;
+		this.resource = type.resource;
+		this.rarity   = type.rarity;
 	}
 	
-	public int getDifficulty () {
-		return difficulty;
-	}
-	
-	public void setDifficulty (int difficulty) {
-		this.difficulty = difficulty;
-	}
-	
-	public int getResource () {
+	public @DrawableRes
+	int getResource () {
 		return resource;
 	}
 	
-	public void setResource (int resource) {
+	public void setResource (@DrawableRes int resource) {
 		this.resource = resource;
+	}
+	
+	public int getRarity () {
+		return rarity;
+	}
+	
+	public void setRarity (int rarity) {
+		this.rarity = rarity;
 	}
 	
 	public enum EnemyType {
@@ -45,18 +44,17 @@ public class EnemySpaceship extends Spaceship {
 		ENEMY_3(R.drawable.spaceship4, 20, 3),
 		ENEMY_4(R.drawable.spaceship5, 30, 4);
 		
-		@DrawableRes int resource;
-		int hp;
-		int difficulty;
+		private @DrawableRes int resource;
+		private int hp;
+		private int rarity;
 		
-		EnemyType (@DrawableRes int resource, int hp, int difficulty) {
-			this.resource   = resource;
-			this.hp         = hp;
-			this.difficulty = difficulty;
+		EnemyType (@DrawableRes int resource, int hp, int rarity) {
+			this.resource = resource;
+			this.hp       = hp;
+			this.rarity   = rarity;
 		}
 		
-		public @DrawableRes
-		int getResoure () {
+		public int getResource () {
 			return resource;
 		}
 		
@@ -64,8 +62,8 @@ public class EnemySpaceship extends Spaceship {
 			return hp;
 		}
 		
-		public int getDifficulty () {
-			return difficulty;
+		public int getRarity () {
+			return rarity;
 		}
 	}
 }

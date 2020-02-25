@@ -35,9 +35,9 @@ public class Spaceship {
 	public void initHealthbar () {
 		Rect bounds = this.image.copyBounds();
 		int width = bounds.right - bounds.left;
-		this.healthbar.set((bounds.left + (width / 2)) - 75,
+		this.healthbar.set((bounds.left + ((float) width / 2)) - 75,
 		                   bounds.bottom + 25,
-		                   (bounds.right - (width / 2)) + 75,
+		                   (bounds.right - ((float) width / 2)) + 75,
 		                   bounds.bottom + 50);
 	}
 	

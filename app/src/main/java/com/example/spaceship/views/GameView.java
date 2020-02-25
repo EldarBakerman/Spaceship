@@ -3,6 +3,7 @@ package com.example.spaceship.views;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,6 +12,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.spaceship.R;
+import com.example.spaceship.activities.GameActivity;
 import com.example.spaceship.classes.EnemySpaceship;
 import com.example.spaceship.classes.PlayerSpaceship;
 import com.example.spaceship.classes.Spaceship;
@@ -28,6 +31,7 @@ import com.example.spaceship.classes.User;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,26 +44,25 @@ public class GameView extends View {
 	
 	//TODO: Reorganize everything
 	
-	private static final int[] TIMER = {10, 20, 30};
-	PlayerSpaceship player;
-	Drawable laser;
-	TextView timerText;
-	//TODO: Draw Spaceships Proportionally
-	Drawable dPlayer;
-	RectF hPlayer;
+	private PlayerSpaceship player;
+	private Drawable laser;
+	private TextView timerText;
+	private Drawable dPlayer;
+	
 	// Boolean Checkers
-	boolean start = true;
-	boolean timerTick = false;
-	boolean tapped = false;
-	boolean laserAnimating = false;
-	boolean miss = false;
-	boolean lost = false;
-	EnemySpaceship[] enemies;
+	private boolean start = true;
+	private boolean timerTick = false;
+	private boolean tapped = false;
+	private boolean laserAnimating = false;
+	private boolean miss = false;
+	private boolean lost = false;
+	private boolean win = false;
+	
+	private EnemySpaceship[] enemies;
 	// TODO: Level & Points
 	TextView pointsText, levelText;
 	private EnemySpaceship hit = null;
 	private LinearLayout infoLayout;
-	// TODO: Proportional size
 	private Paint hbStroke;
 	private Paint hbFill;
 	private int level, points;
@@ -106,7 +109,7 @@ public class GameView extends View {
 		timerText.setTextAlignment(TEXT_ALIGNMENT_CENTER);
 		timerText.setVisibility(VISIBLE);
 		timerText.setTextSize(22);
-		timerText.setText(String.format(Locale.ENGLISH, "%d", TIMER[2]));
+		timerText.setText(String.format(Locale.ENGLISH, "%d", 30));
 		timerText.setTextColor(Color.WHITE);
 		timerText.setTypeface(null, Typeface.BOLD);
 		timerText.setLayoutParams(params);
@@ -116,24 +119,26 @@ public class GameView extends View {
 		// Player & Player Healthbar
 		
 		dPlayer = player.getImage();
-		hPlayer = player.getHealthbar();
-		
+		player.getWeapon().setImage(getResources().getDrawable(R.drawable.red_laser, null));
+
 		// Laser
 		// TODO: Replace direct call to Drawable file with Weapon#getDrawable
-		laser = getResources().getDrawable(R.drawable.red_laser, null);
-		// TODO: Make generateEnemies completely automatic (not requiring input/having an
-		//  automatic input)
-		generateEnemies(4);
+		laser = player.getWeapon().getImage();
 		
 		// Timer Method
 		
 		Activity activity = (Activity) context;
-		
-		//TODO: Method to determine TIMER seconds by difficulty
+
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run () {
+				if (lost || win) {
+					timer.cancel();
+					postInvalidate();
+					return;
+				}
+				
 				int timeLeft = Integer.parseInt(timerText.getText().toString());
 				if (timeLeft <= 0) {
 					explode(player);
@@ -148,23 +153,18 @@ public class GameView extends View {
 				}
 			}
 		}, 1000, 1000);
-		
-		enemies[0].getImage().setBounds(100, 200, 300, 400);
-		enemies[1].getImage().setBounds(500, 200, 700, 400);
-		//		enemies[2].getImage().setBounds(900, 200, 900, 400);
-		//		enemies[3].getImage().setBounds(400, 500, 600, 700);
 	}
 	
-	// TODO: Generate automatic coordinates
-	private void generateEnemies (int amount) {
-		enemies = new EnemySpaceship[amount];
-		for (int i = 0; i < amount; i++) {
-			enemies[i] =
-					new EnemySpaceship(EnemySpaceship.EnemyType.valueOf(String.format(Locale.ENGLISH,
-					                                                                  "ENEMY_%d",
-					                                                                  i + 1)));
-			enemies[i].setImage(getResources().getDrawable(enemies[i].getResource(), null));
+	@Override
+	public boolean performClick () {
+		tapped = true;
+		if (win || lost) {
+			Activity activity = ((Activity) getContext());
+			activity.finish();
+			activity.startActivity(new Intent(activity, GameActivity.class));
 		}
+		postInvalidate();
+		return super.performClick();
 	}
 	
 	/**
@@ -183,7 +183,11 @@ public class GameView extends View {
 			return;
 		}
 		
-		// TODO: Array of enemy spaceships
+		if (win) {
+			start = timerTick = tapped = laserAnimating = miss = false;
+			winText(canvas);
+			return;
+		}
 		
 		// TODO: Documentation
 		
@@ -195,12 +199,13 @@ public class GameView extends View {
 			                  getWidth() / 2 + 150,
 			                  getHeight() - 100);
 			start = false;
+			generateEnemies(new Random().nextInt(6) + 1);
 		}
 		
-		enemies[0].getImage().draw(canvas);
-		enemies[1].getImage().draw(canvas);
-		initHealthbar(canvas, enemies[0]);
-		initHealthbar(canvas, enemies[1]);
+		for (EnemySpaceship enemy : enemies) {
+			enemy.getImage().draw(canvas);
+			initHealthbar(canvas, enemy);
+		}
 		
 		dPlayer.draw(canvas);
 		initHealthbar(canvas, player);
@@ -244,6 +249,34 @@ public class GameView extends View {
 			player.updateExplosion();
 			player.getExplosion().draw(canvas);
 		}
+		
+		boolean noEnemies = false;
+		for (EnemySpaceship enemy : enemies) {
+			if (enemy.getImage().getBounds().isEmpty())
+				noEnemies = true;
+			else {
+				noEnemies = false;
+				break;
+			}
+		}
+		
+		if (noEnemies) {
+			win = true;
+			winText(canvas);
+		}
+		
+	}
+	
+	private void loseText (Canvas canvas) {
+		TextPaint losePaint = new TextPaint();
+		losePaint.setColor(Color.RED);
+		losePaint.setTextSize(36);
+		losePaint.setTextAlign(Paint.Align.CENTER);
+		losePaint.setTypeface(Typeface.DEFAULT_BOLD);
+		
+		canvas.drawText("Game Over!", (float) getWidth() / 2, (float) getHeight() / 2, losePaint);
+		
+		restartText(canvas);
 	}
 	
 	private void explode (Spaceship spaceship) {
@@ -253,9 +286,6 @@ public class GameView extends View {
 			
 			@Override
 			public void run () {
-				// TODO: Find a way to count timer without public variable or create a local
-				//  variable for every instance of timer
-				
 				if (timerCount < 3)
 					spaceship.setExplosion(getRes("explosion" + timerCount), timerCount);
 				else {
@@ -347,14 +377,192 @@ public class GameView extends View {
 		                bounds.top - 10);
 	}
 	
-	private void loseText (Canvas canvas) {
-		TextPaint losePaint = new TextPaint();
-		losePaint.setColor(Color.RED);
-		losePaint.setTextSize(36);
-		losePaint.setTextAlign(Paint.Align.CENTER);
-		losePaint.setTypeface(Typeface.DEFAULT_BOLD);
+	private void winText (Canvas canvas) {
+		TextPaint winPaint = new TextPaint();
+		winPaint.setColor(Color.GREEN);
+		winPaint.setTextSize(36);
+		winPaint.setTextAlign(Paint.Align.CENTER);
+		winPaint.setTypeface(Typeface.DEFAULT_BOLD);
 		
-		canvas.drawText("Game Over!", getWidth() / 2, getHeight() / 2, losePaint);
+		canvas.drawText("You won!", (float) getWidth() / 2, (float) getHeight() / 2, winPaint);
+		restartText(canvas);
+	}
+	
+	// TODO: Generate automatic coordinates
+	private void generateEnemies (int amount) {
+		if (amount > 6 || amount < 1)
+			throw new AssertionError("amount is invalid");
+		
+		enemies = new EnemySpaceship[amount];
+		
+		/* Chances array in order to generate chances in accordance to the rarity of the EnemyType
+		 * by creating an array of numbers representing the number of EnemyType.
+		 * Each number is appearing (5 - rarity) times in the array, then a number is chosen
+		 * randomly using the Random class. Since the appearance of some types in the array is
+		 * more frequent than others, it creates a chance in accordance to the rarity of the type.
+		 */
+		
+		int[] chances = new int[0];
+		
+		
+		for (int i = 0; i < amount; i++) {
+			
+			// Get EnemyType by String using the i of the for loop
+			final EnemySpaceship.EnemyType enemyType =
+					EnemySpaceship.EnemyType.valueOf(String.format(Locale.ENGLISH,
+					                                               "ENEMY_%d",
+					                                               i + 1));
+			int oldLength = chances.length;
+			
+			// Create a temporary array to hold the previous values (to save from being nullified)
+			int[] oldChances = new int[oldLength];
+			System.arraycopy(chances, 0, oldChances, 0, oldLength);
+			
+			// Increase the length of the array by (5 - rarity)
+			chances = new int[oldLength + (5 - enemyType.getRarity())];
+			
+			// Retrieve the previous values to the new array
+			System.arraycopy(oldChances, 0, chances, 0, oldLength);
+			
+			// Add the new values to the new array (the EnemyType number)
+			for (int j = oldLength; j < chances.length; j++) {
+				chances[j] = i + 1;
+			}
+		}
+		
+		// Use Random to set a pattern of coordinates for the ships (the amount of patterns is 2)
+		Random rPattern = new Random();
+		int pattern = rPattern.nextInt(2);
+		
+		for (int i = 0; i < amount; i++) {
+			
+			// Use Random to generate the wanted amount of enemies randomly, in accordance to
+			// rarity
+			Random random = new Random();
+			enemies[i] =
+					new EnemySpaceship(EnemySpaceship.EnemyType.valueOf(String.format(Locale.ENGLISH,
+					                                                                  "ENEMY_%d",
+					                                                                  chances[random.nextInt(
+							                                                                  chances.length)])));
+			enemies[i].setImage(getResources().getDrawable(enemies[i].getResource(), null));
+			
+			// If method was called from constructor - exit (can't set coordinates if canvas
+			// hasn't loaded yet)
+			if (start)
+				return;
+			
+			final int LEFT_EDGE = 0;
+			final int LEFT_MARGIN_EDGE = LEFT_EDGE + 100;
+			final int RIGHT_EDGE = getWidth();
+			final int RIGHT_MARGIN_EDGE = RIGHT_EDGE - 100;
+			final int TOP_EDGE = 0;
+			final int TOP_MARGIN_EDGE = TOP_EDGE + 200;
+			final int WIDTH = 200;
+			final int HEIGHT = 200;
+			final int CENTER_LEFT = getWidth() / 2 - WIDTH / 2;
+			final int CENTER_RIGHT = getWidth() / 2 + WIDTH / 2;
+			final int BOTTOM_MARGIN = TOP_MARGIN_EDGE + HEIGHT;
+			final int RIGHT_MARGIN = LEFT_MARGIN_EDGE + WIDTH;
+			final Drawable image = enemies[i].getImage();
+			final Rect enemyBounds = i >= 2 ? enemies[i - 2].getImage().getBounds() : new Rect();
+			final int PREV_BOTTOM_MARGIN = enemyBounds.bottom + 100;
+			
+			Log.d("GameView#generate", String.format("Pattern: %d ; Amount: %d", pattern, amount));
+			
+			/* Pattern 0 (enemy spaceships represented by 0):
+			 * If amount is odd
+			 * 0       0
+			 * 0       0
+			 *     0
+			 *
+			 * If amount is even
+			 * 0       0
+			 * 0       0
+			 */
+			
+			if (pattern == 0) {
+				if (amount % 2 == 0 || i < amount - 1) {
+					
+					
+					if (i % 2 == 0)
+						image.setBounds(LEFT_MARGIN_EDGE,
+						                i == 0 ? TOP_MARGIN_EDGE : PREV_BOTTOM_MARGIN,
+						                RIGHT_MARGIN,
+						                i == 0 ? BOTTOM_MARGIN : PREV_BOTTOM_MARGIN + HEIGHT);
+					else
+						image.setBounds(RIGHT_MARGIN_EDGE - WIDTH,
+						                i == 1 ? TOP_MARGIN_EDGE : PREV_BOTTOM_MARGIN,
+						                RIGHT_MARGIN_EDGE,
+						                i == 1 ? BOTTOM_MARGIN : PREV_BOTTOM_MARGIN + HEIGHT);
+				} else
+					image.setBounds(CENTER_LEFT,
+					                i >= 2 ? PREV_BOTTOM_MARGIN : TOP_MARGIN_EDGE,
+					                CENTER_RIGHT,
+					                i >= 2 ? PREV_BOTTOM_MARGIN + HEIGHT : BOTTOM_MARGIN);
+			} else if (pattern == 1) {
+				
+				/*
+				 * Pattern 1 (enemy spaceships represented by 0):
+				 * If amount is odd (above 3 - below 3 is one line of enemies)
+				 * 0 0 0
+				 * 0   0
+				 *
+				 * If amount is even (above 3 - below 3 is one line of enemies)
+				 * 0 0 0
+				 *   0
+				 */
+				
+				switch (i) {
+					case 0:
+						image.setBounds(LEFT_MARGIN_EDGE,
+						                TOP_MARGIN_EDGE,
+						                RIGHT_MARGIN,
+						                BOTTOM_MARGIN);
+						break;
+					case 1:
+						if (amount == 2)
+							image.setBounds(RIGHT_MARGIN_EDGE - WIDTH,
+							                TOP_MARGIN_EDGE,
+							                RIGHT_MARGIN_EDGE,
+							                BOTTOM_MARGIN);
+						else
+							image.setBounds(CENTER_LEFT,
+							                TOP_MARGIN_EDGE,
+							                CENTER_RIGHT,
+							                BOTTOM_MARGIN);
+						break;
+					case 2:
+						image.setBounds(RIGHT_MARGIN_EDGE - WIDTH,
+						                TOP_MARGIN_EDGE,
+						                RIGHT_MARGIN_EDGE,
+						                BOTTOM_MARGIN);
+						break;
+					case 3:
+						image.setBounds(LEFT_MARGIN_EDGE,
+						                PREV_BOTTOM_MARGIN,
+						                RIGHT_MARGIN,
+						                PREV_BOTTOM_MARGIN + HEIGHT);
+					case 4:
+						if (amount == 5)
+							image.setBounds(RIGHT_MARGIN_EDGE - WIDTH,
+							                PREV_BOTTOM_MARGIN,
+							                RIGHT_MARGIN_EDGE,
+							                PREV_BOTTOM_MARGIN + HEIGHT);
+						else
+							image.setBounds(CENTER_LEFT,
+							                PREV_BOTTOM_MARGIN,
+							                CENTER_RIGHT,
+							                PREV_BOTTOM_MARGIN + HEIGHT);
+						break;
+					case 5:
+						image.setBounds(RIGHT_MARGIN_EDGE - WIDTH,
+						                PREV_BOTTOM_MARGIN,
+						                RIGHT_MARGIN_EDGE,
+						                PREV_BOTTOM_MARGIN + HEIGHT);
+						break;
+				}
+			}
+		}
 	}
 	
 	private void initHealthbar (Canvas canvas, Spaceship sp) {
@@ -426,12 +634,17 @@ public class GameView extends View {
 		canvas.restore();
 	}
 	
-	
-	@Override
-	public boolean performClick () {
-		tapped = true;
-		postInvalidate();
-		return super.performClick();
+	private void restartText (Canvas canvas) {
+		TextPaint restartPaint = new TextPaint();
+		restartPaint.setColor(Color.WHITE);
+		restartPaint.setTextSize(36);
+		restartPaint.setTextAlign(Paint.Align.CENTER);
+		restartPaint.setTypeface(Typeface.DEFAULT_BOLD);
+		
+		canvas.drawText("Tap anywhere to restart",
+		                (float) getWidth() / 2,
+		                (float) getHeight() / 2 + 100,
+		                restartPaint);
 	}
 	
 	private Drawable getRes (String id) {
