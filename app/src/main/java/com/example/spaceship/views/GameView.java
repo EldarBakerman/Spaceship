@@ -119,7 +119,6 @@ public class GameView extends View {
 		player.getWeapon().setImage(getResources().getDrawable(R.drawable.red_laser, null));
 		
 		// Laser
-		// TODO: Replace direct call to Drawable file with Weapon#getDrawable
 		laser = player.getWeapon().getImage();
 		
 		// Timer Method
@@ -242,8 +241,6 @@ public class GameView extends View {
 			winText(canvas);
 			return;
 		}
-		
-		// TODO: Documentation
 		
 		// Animation
 		if (start) {
