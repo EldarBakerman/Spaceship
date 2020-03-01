@@ -158,15 +158,6 @@ public class Spaceship {
 		this.explosion = explosion;
 	}
 	
-	public void updateExplosion () {
-		setExplosion(stage);
-	}
-	
-	public void setExplosion (Drawable explosion, int stage) {
-		setExplosion(explosion);
-		setExplosion(stage);
-	}
-	
 	public void setExplosion (int stage) {
 		if (stage > 3 || this.explosion == null) {
 			this.stage = -1;
@@ -204,5 +195,14 @@ public class Spaceship {
 				this.hpLayout.setVisibility(INVISIBLE);
 				break;
 		}
+	}
+	
+	public void updateExplosion () {
+		setExplosion(stage);
+	}
+	
+	public void setExplosion (Drawable explosion, int stage) {
+		setExplosion(explosion);
+		setExplosion(stage);
 	}
 }

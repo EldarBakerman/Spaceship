@@ -5,51 +5,73 @@ import android.graphics.drawable.Drawable;
 
 public class PlayerSpaceship extends Spaceship {
 	
-	static final Weapon DEFAULT_WEAPON = new Weapon("Default", 5, 2, 1);
 	private static final int DEFAULT_HP = 15;
-	
-	
+	private static Weapon equippedWeapon;
 	private Weapon weapon;
 	
 	public PlayerSpaceship () {
 		super();
-		resetWeapon();
 		this.hp      = DEFAULT_HP;
 		this.hpTotal = DEFAULT_HP;
-	}
-	
-	public void resetWeapon () {
-		this.weapon = new Weapon(DEFAULT_WEAPON.getName(),
-		                         DEFAULT_WEAPON.getDamage(),
-		                         DEFAULT_WEAPON.getFirerate(),
-		                         DEFAULT_WEAPON.getSpeed());
+		this.weapon  = Weapon.copyWeapon(Weapon.WEAPON_0);
+		this.weapon.setEquipped(true);
+		PlayerSpaceship.equippedWeapon = this.weapon;
 	}
 	
 	public PlayerSpaceship (Drawable image) {
 		super(image, DEFAULT_HP);
-		resetWeapon();
+		this.weapon = Weapon.copyWeapon(Weapon.WEAPON_0);
+		this.weapon.setEquipped(true);
+		PlayerSpaceship.equippedWeapon = this.weapon;
 	}
 	
 	public PlayerSpaceship (Drawable image, int hp) {
 		super(image, hp);
-		resetWeapon();
+		this.weapon = Weapon.copyWeapon(Weapon.WEAPON_0);
+		this.weapon.setEquipped(true);
+		PlayerSpaceship.equippedWeapon = this.weapon;
 	}
 	
 	public PlayerSpaceship (Drawable image, int hp, int hpTotal, Weapon weapon) {
 		super(image, hp, hpTotal);
 		this.weapon = weapon;
+		this.weapon.setEquipped(true);
+		PlayerSpaceship.equippedWeapon = this.weapon;
 	}
 	
 	public PlayerSpaceship (Drawable image, int hp, int hpTotal, RectF healthbar, Weapon weapon) {
 		super(image, hp, hpTotal, healthbar);
 		this.weapon = weapon;
+		this.weapon.setEquipped(true);
+		PlayerSpaceship.equippedWeapon = this.weapon;
+	}
+	
+	public static Weapon getEquippedWeapon () {
+		return equippedWeapon;
+	}
+	
+	public static void setEquippedWeapon (Weapon equippedWeapon) {
+		if (!equippedWeapon.isOwned())
+			throw new AssertionError("weapon isn't owned");
+		
+		PlayerSpaceship.equippedWeapon = equippedWeapon;
 	}
 	
 	public Weapon getWeapon () {
 		return weapon;
 	}
 	
+	public void updateWeapon () {
+		this.setWeapon(equippedWeapon);
+	}
+	
 	public void setWeapon (Weapon weapon) {
+		if (!weapon.isOwned())
+			throw new AssertionError("weapon isn't owned");
+		
+		this.weapon.setEquipped(false);
 		this.weapon = weapon;
+		this.weapon.setEquipped(true);
+		PlayerSpaceship.equippedWeapon = this.weapon;
 	}
 }

@@ -403,7 +403,7 @@ public class GameView extends View {
 	 * movement from one edge of the screen to the other
 	 *
 	 * @param left a parameter that indicates whether the
-	 * {@link com.example.spaceship.classes.PlayerSpaceship
+	 *             {@link com.example.spaceship.classes.PlayerSpaceship
 	 *             spaceship} should move left or right.
 	 */
 	
@@ -634,7 +634,8 @@ public class GameView extends View {
 					case 5:
 						image.setBounds(RIGHT_MARGIN_EDGE - WIDTH,
 						                PREV_BOTTOM_MARGIN,
-						                RIGHT_MARGIN_EDGE, PREV_BOTTOM_MARGIN + HEIGHT);
+						                RIGHT_MARGIN_EDGE,
+						                PREV_BOTTOM_MARGIN + HEIGHT);
 						break;
 				}
 			}
@@ -710,7 +711,8 @@ public class GameView extends View {
 		hpLayout.setBottom((int) (hb.top + 5));
 		hpLayout.setLeft((int) ((hb.left + (hb.width() / 2)) - 25));
 		hpLayout.setRight((int) ((hb.right - (hb.width() / 2)) + 25));
-		LayoutParams hpParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		LayoutParams hpParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+		                                         LayoutParams.MATCH_PARENT);
 		
 		sp.setHpText(new TextView(getContext()));
 		TextView hpText = sp.getHpText();
