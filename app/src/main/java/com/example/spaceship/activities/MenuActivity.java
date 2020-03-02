@@ -20,9 +20,8 @@ public class MenuActivity extends AppCompatActivity {
 		startActivity(new Intent(MenuActivity.this, GameActivity.class));
 	}
 	
-	//TODO: Store Activity
-	//    public void startStore(View view) {
-	//        startActivity(new Intent(MenuActivity.this, StoreActivity.class));
-	//    }
-	//TODO: WeaponStore class
+	// TODO: Store Activity
+	public void startStore (View view) {
+		startActivity(new Intent(MenuActivity.this, StoreActivity.class));
+	}
 }

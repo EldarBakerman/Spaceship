@@ -1,8 +1,7 @@
 package com.example.spaceship.activities;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,16 +24,30 @@ public class StoreActivity extends AppCompatActivity {
 		weapons = findViewById(R.id.weapons_list);
 		weapons.setAdapter(adapter);
 		
-		weapons.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
-				final Weapon weapon = Weapon.weapons.get(position);
-				if (weapon.isOwned())
-					return;
+		weapons.setOnItemClickListener((parent, view, position, id) -> {
+			final Weapon weapon = Weapon.weapons.get(position);
+			if (weapon.isOwned() && weapon.isEquipped())
+				return;
+			
+			Button buyBtn = view.findViewById(R.id.buy);
+			if (!weapon.isOwned()) {
 				// TODO: Make purchase using points
+				weapon.setOwned(true);
+			} else if (!weapon.isEquipped()) {
+				final Weapon equippedWeapon = PlayerSpaceship.getEquippedWeapon();
+				equippedWeapon.setEquipped(false);
+				//int pos = Weapon.weapons.indexOf(equippedWeapon);
+				
+				//weapons.setItemChecked(pos, true);
+				//View prevWeapon = adapter.getView(pos, null, weapons);
+				//StoreWeaponAdapter.setButtonFormat(prevWeapon.getResources(),
+				//                                 equippedWeapon,
+				//                                  prevWeapon.findViewById(R.id.buy));
+				
+				weapon.setEquipped(true);
 				PlayerSpaceship.setEquippedWeapon(weapon);
-				view.findViewById(R.id.buy);
 			}
+			StoreWeaponAdapter.setButtonFormat(view.getResources(), weapon, buyBtn);
 		});
 	}
 }

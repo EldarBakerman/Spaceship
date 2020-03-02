@@ -2,4 +2,9 @@
 	<string name="app_name">Spaceship</string>
 	<string name="menu_start">Start Game</string>
 	<string name="menu_store">Store</string>
+	<string name="equipped">Equipped</string>
+	<string name="equip">equip</string>
+	<string name="buy">"Buy - "</string>
+	<string name="damage">"Damage: "</string>
+	<string name="speed">"Speed: "</string>
 </resources>
