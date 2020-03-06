@@ -6,6 +6,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/weapons_background"
                 android:gravity="center"
+                android:descendantFocusability="blocksDescendants"
                 tools:ignore="ContentDescription">
 	
 	<ImageView

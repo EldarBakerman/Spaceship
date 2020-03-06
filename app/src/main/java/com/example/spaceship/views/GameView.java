@@ -47,7 +47,7 @@ public class GameView extends View {
 	//TODO: Reorganize everything
 	
 	// TODO: Level & Points
-	TextView pointsText, levelText;
+	TextView pointsText;
 	private PlayerSpaceship player;
 	private Drawable laser;
 	private TextView timerText;
@@ -65,7 +65,7 @@ public class GameView extends View {
 	private LinearLayout infoLayout;
 	private Paint hbStroke;
 	private Paint hbFill;
-	private int level, points;
+	private int points;
 	//TODO: User & Database
 	private User user;
 	
@@ -169,8 +169,10 @@ public class GameView extends View {
 				else {
 					spaceship.setExplosion(timerCount);
 					timer.cancel();
-					if (spaceship instanceof PlayerSpaceship)
+					if (spaceship instanceof PlayerSpaceship) {
 						lost = true;
+						
+					}
 					hit = null;
 					invalidate();
 				}
@@ -212,7 +214,9 @@ public class GameView extends View {
 		if (win || lost) {
 			Activity activity = ((Activity) getContext());
 			activity.finish();
-			activity.startActivity(new Intent(activity, GameActivity.class));
+			Intent intent = new Intent(activity, GameActivity.class);
+			intent.putExtra("points", points);
+			activity.startActivity(intent);
 		}
 		postInvalidate();
 		return super.performClick();

@@ -7,10 +7,10 @@ import java.util.List;
 
 public class Weapon {
 	
-	public static final Weapon WEAPON_0;
-	public static final Weapon WEAPON_1;
-	public static final Weapon WEAPON_2;
-	public static final Weapon WEAPON_3;
+	static final Weapon WEAPON_0;
+	private static final Weapon WEAPON_1;
+	private static final Weapon WEAPON_2;
+	private static final Weapon WEAPON_3;
 	public static List<Weapon> weapons = new ArrayList<>();
 	
 	static {
@@ -95,7 +95,8 @@ public class Weapon {
 	}
 	
 	public void setEquipped (boolean equipped) {
-		assert owned : "can't equip if not owned";
+		if (!owned)
+			throw new AssertionError("can't equip if not owned");
 		this.equipped = equipped;
 	}
 	
@@ -120,6 +121,7 @@ public class Weapon {
 	}
 	
 	public void setOwned (boolean owned) {
-		this.owned = owned;
+		this.owned    = owned;
+		this.equipped = owned && this.equipped;
 	}
 }

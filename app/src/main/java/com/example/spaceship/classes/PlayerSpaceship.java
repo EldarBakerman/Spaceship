@@ -13,21 +13,21 @@ public class PlayerSpaceship extends Spaceship {
 		super();
 		this.hp      = DEFAULT_HP;
 		this.hpTotal = DEFAULT_HP;
-		this.weapon  = Weapon.copyWeapon(Weapon.WEAPON_0);
+		this.weapon  = Weapon.WEAPON_0;
 		this.weapon.setEquipped(true);
 		PlayerSpaceship.equippedWeapon = this.weapon;
 	}
 	
 	public PlayerSpaceship (Drawable image) {
 		super(image, DEFAULT_HP);
-		this.weapon = Weapon.copyWeapon(Weapon.WEAPON_0);
+		this.weapon = Weapon.WEAPON_0;
 		this.weapon.setEquipped(true);
 		PlayerSpaceship.equippedWeapon = this.weapon;
 	}
 	
 	public PlayerSpaceship (Drawable image, int hp) {
 		super(image, hp);
-		this.weapon = Weapon.copyWeapon(Weapon.WEAPON_0);
+		this.weapon = Weapon.WEAPON_0;
 		this.weapon.setEquipped(true);
 		PlayerSpaceship.equippedWeapon = this.weapon;
 	}
