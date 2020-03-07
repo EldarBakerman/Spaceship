@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * SQLite database class that manages the database of the app
+ * SQLite Database class that manages the Database of the app
  */
 
 abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
@@ -109,7 +109,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 	/**
 	 * Database constructor
 	 *
-	 * @param context activity from which the database is initialized
+	 * @param context activity from which the Database is initialized
 	 */
 	
 	public DatabaseOpenHelper (@Nullable Context context) {
@@ -118,7 +118,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Insert {@link User user} into the database
+	 * Insert {@link User user} into the Database
 	 *
 	 * @param user user to insert
 	 *
@@ -137,7 +137,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Insert {@link Weapon weapon} into the database
+	 * Insert {@link Weapon weapon} into the Database
 	 *
 	 * @param weapon weapon to insert
 	 *
@@ -157,7 +157,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Insert {@link com.example.spaceship.classes.EnemySpaceship enemy} into the database
+	 * Insert {@link com.example.spaceship.classes.EnemySpaceship enemy} into the Database
 	 *
 	 * @param spaceship the enemy to insert
 	 *
@@ -174,7 +174,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Insert {@link com.example.spaceship.classes.PlayerSpaceship player} into the database
+	 * Insert {@link com.example.spaceship.classes.PlayerSpaceship player} into the Database
 	 *
 	 * @param spaceship the player to insert
 	 *
@@ -190,6 +190,16 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		return spaceship;
 	}
 	
+	/**
+	 * Deletes {@link com.example.spaceship.classes.User user} from the Database
+	 *
+	 * @param user the user to be deleted
+	 *
+	 * @return the user that was deleted
+	 *
+	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getUser(User)
+	 */
+	
 	public User deleteUser (User user) {
 		User res = getUser(user);
 		database.delete(DatabaseOpenHelper.TABLE_USERS,
@@ -198,9 +208,27 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		return res;
 	}
 	
+	/**
+	 * Returns the desired user from the Database
+	 *
+	 * @param user the desired user to find in the Database
+	 *
+	 * @return the desired user from the Database
+	 *
+	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getUser(long)
+	 */
+	
 	public User getUser (User user) {
 		return getUser(user.getId());
 	}
+	
+	/**
+	 * Returns the desired user from the Database
+	 *
+	 * @param id the id of the desired user
+	 *
+	 * @return the desired user from the Database
+	 */
 	
 	public User getUser (long id) {
 		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_USERS,
@@ -228,6 +256,16 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		return new User(userId, userName, userPoints, userHighscore);
 	}
 	
+	/**
+	 * Removes a user from the Database
+	 *
+	 * @param id the id of the user
+	 *
+	 * @return the user that was deleted
+	 *
+	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getUser(long)
+	 */
+	
 	public User deleteUser (long id) {
 		User res = getUser(id);
 		database.delete(DatabaseOpenHelper.TABLE_USERS,
@@ -237,7 +275,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Deletes a weapon from the database
+	 * Removes a weapon from the Database
 	 *
 	 * @param weapon the weapon to be deleted
 	 *
@@ -328,9 +366,18 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 			                  weaponDamage,
 			                  weaponSpeed,
 			                  weaponPrice,
-			                  weaponOwned,
-			                  weaponEquipped);
+			                  weaponOwned, weaponEquipped);
 	}
+	
+	/**
+	 * Removes a weapon from the Database
+	 *
+	 * @param id the id of the weapon
+	 *
+	 * @return the weapon that was deleted
+	 *
+	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getWeapon(long)
+	 */
 	
 	public Weapon deleteWeapon (long id) {
 		Weapon res = getWeapon(id);
@@ -339,6 +386,16 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		                null);
 		return res;
 	}
+	
+	/**
+	 * Returns a {@link java.util.List<com.example.spaceship.classes.User> list} of all the
+	 * users in
+	 * the Database.
+	 *
+	 * @return a {@link java.util.List<com.example.spaceship.classes.User> list} of all the
+	 * 		users in
+	 * 		the Database.
+	 */
 	
 	public List<User> getAllUsers () {
 		List<User> users = new ArrayList<>();
@@ -354,8 +411,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 			return null;
 		
 		while (cursor.moveToNext()) {
-			long userId =
-					cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_ID));
+			long userId = cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_ID));
 			String userName =
 					cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_NAME));
 			// TODO: Blob, Bitmap or String
