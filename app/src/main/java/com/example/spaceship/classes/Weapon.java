@@ -2,6 +2,8 @@ package com.example.spaceship.classes;
 
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class Weapon {
 		WEAPON_3 = new Weapon("Purified Light", 30, 2, 100);
 	}
 	
+	private long id;
 	private String name;
 	private int damage;
 	private int speed;
@@ -31,7 +34,20 @@ public class Weapon {
 	private int price;
 	private boolean owned;
 	
+	public Weapon (long id, String name, int damage, int speed, int price, boolean equipped,
+	               boolean owned) {
+		this.id       = id;
+		this.name     = name;
+		this.damage   = damage;
+		this.speed    = speed;
+		this.price    = price;
+		this.equipped = equipped;
+		this.owned    = owned;
+		weapons.add(this);
+	}
+	
 	public Weapon (String name, int damage, int speed, int price) {
+		this.id     = -1;
 		this.name   = name;
 		this.damage = damage;
 		this.speed  = speed;
@@ -40,6 +56,7 @@ public class Weapon {
 	}
 	
 	public Weapon (String name, int damage, int speed, Drawable image, int price) {
+		this.id     = -1;
 		this.name   = name;
 		this.damage = damage;
 		this.speed  = speed;
@@ -48,22 +65,48 @@ public class Weapon {
 		weapons.add(this);
 	}
 	
-	public static Weapon copyWeapon (Weapon weapon) {
-		Weapon res = new Weapon(weapon.name,
-		                        weapon.damage,
-		                        weapon.speed,
-		                        weapon.image,
-		                        weapon.price);
-		weapons.remove(weapons.size() - 1);
-		return res;
+	public Drawable getImage () {
+		return image;
+	}
+	
+	public void setImage (Drawable image) {
+		this.image = image;
+	}
+	
+	public String getDamageString () {
+		return this.damage + " HP";
+	}
+	
+	public String getSpeedString () {
+		return this.speed + " au/h";
+	}
+	
+	@Override
+	public boolean equals (@Nullable Object obj) {
+		return obj instanceof Weapon &&
+		       ((Weapon) obj).getId() == this.id &&
+		       ((Weapon) obj).getName().equals(this.name) &&
+		       ((Weapon) obj).getPrice() == this.price &&
+		       ((Weapon) obj).getDamage() == this.damage &&
+		       ((Weapon) obj).getSpeed() == this.speed &&
+		       ((Weapon) obj).isOwned() == this.owned &&
+		       ((Weapon) obj).isEquipped() == this.equipped;
+	}
+	
+	public long getId () {
+		return id;
 	}
 	
 	public String getName () {
 		return name;
 	}
 	
-	public void setName (String name) {
-		this.name = name;
+	public int getPrice () {
+		return price;
+	}
+	
+	public void setPrice (int price) {
+		this.price = price;
 	}
 	
 	public int getDamage () {
@@ -82,12 +125,8 @@ public class Weapon {
 		this.speed = speed;
 	}
 	
-	public Drawable getImage () {
-		return image;
-	}
-	
-	public void setImage (Drawable image) {
-		this.image = image;
+	public boolean isOwned () {
+		return owned;
 	}
 	
 	public boolean isEquipped () {
@@ -100,28 +139,16 @@ public class Weapon {
 		this.equipped = equipped;
 	}
 	
-	public String getDamageString () {
-		return this.damage + " HP";
-	}
-	
-	public String getSpeedString () {
-		return this.speed + " au/h";
-	}
-	
-	public int getPrice () {
-		return price;
-	}
-	
-	public void setPrice (int price) {
-		this.price = price;
-	}
-	
-	public boolean isOwned () {
-		return owned;
-	}
-	
 	public void setOwned (boolean owned) {
 		this.owned    = owned;
 		this.equipped = owned && this.equipped;
+	}
+	
+	public void setId (long id) {
+		this.id = id;
+	}
+	
+	public void setName (String name) {
+		this.name = name;
 	}
 }

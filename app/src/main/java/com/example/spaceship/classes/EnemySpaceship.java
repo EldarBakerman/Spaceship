@@ -8,6 +8,7 @@ public class EnemySpaceship extends Spaceship {
 	
 	private int resource;
 	private int rarity;
+	private int type;
 	
 	public EnemySpaceship () {
 		super();
@@ -18,6 +19,11 @@ public class EnemySpaceship extends Spaceship {
 		this.hpTotal  = type.hp;
 		this.resource = type.resource;
 		this.rarity   = type.rarity;
+		this.type     = Integer.parseInt(type.name().substring(type.name().length() - 1));
+	}
+	
+	public EnemySpaceship (long id, int type) {
+		super(id, type);
 	}
 	
 	public @DrawableRes
@@ -35,6 +41,14 @@ public class EnemySpaceship extends Spaceship {
 	
 	public void setRarity (int rarity) {
 		this.rarity = rarity;
+	}
+	
+	public int getType () {
+		return type;
+	}
+	
+	public void setType (int type) {
+		this.type = type;
 	}
 	
 	public enum EnemyType {

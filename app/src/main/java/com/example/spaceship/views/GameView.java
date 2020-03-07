@@ -211,17 +211,27 @@ public class GameView extends View {
 	@Override
 	public boolean performClick () {
 		tapped = true;
-		if (win || lost) {
-			Activity activity = ((Activity) getContext());
-			activity.finish();
-			Intent intent = new Intent(activity, GameActivity.class);
-			intent.putExtra("points", points);
-			activity.startActivity(intent);
-		}
+		if (win || lost)
+			launchGame();
 		postInvalidate();
 		return super.performClick();
 	}
 	
+	/**
+	 * Launches a new game, if won, passes the points value to the new game and updates the
+	 * highscore of the {@link com.example.spaceship.classes.User user}.
+	 */
+	
+	private void launchGame () {
+		Activity activity = ((Activity) getContext());
+		Intent intent = new Intent(activity, GameActivity.class);
+		
+		if (win)
+			intent.putExtra("points", points);
+		
+		activity.startActivity(intent);
+		activity.finish();
+	}
 	
 	/**
 	 * {@link View#onDraw(Canvas) onDraw} method implemented from {@link View view} that draws the
@@ -240,11 +250,8 @@ public class GameView extends View {
 			return;
 		}
 		
-		if (win) {
-			start = timerTick = tapped = laserAnimating = miss = false;
-			winText(canvas);
-			return;
-		}
+		if (win)
+			launchGame();
 		
 		// Animation
 		if (start) {
@@ -315,10 +322,8 @@ public class GameView extends View {
 			}
 		}
 		
-		if (noEnemies) {
+		if (noEnemies)
 			win = true;
-			winText(canvas);
-		}
 		
 	}
 	
@@ -374,89 +379,6 @@ public class GameView extends View {
 			invalidate();
 		});
 		animator.start();
-	}
-	
-	/**
-	 * Calculates the {@link com.example.spaceship.classes.EnemySpaceship spaceship} that the laser
-	 * hits and returns that {@link com.example.spaceship.classes.EnemySpaceship spaceship}.
-	 *
-	 * @return the {@link com.example.spaceship.classes.EnemySpaceship spaceship} that the laser
-	 * 		will hit. Null if laser's X coordinate is not in range of any {@link
-	 *        com.example.spaceship.classes.EnemySpaceship spaceship}
-	 */
-	
-	private EnemySpaceship laserTarget () {
-		if (enemies == null || enemies.length <= 0 || laser == null)
-			return null;
-		
-		EnemySpaceship result = null;
-		
-		for (EnemySpaceship enemy : enemies) {
-			final Rect enemyBounds = enemy.getImage().getBounds();
-			final Rect laserBounds = laser.getBounds();
-			
-			if (enemyBounds.left <= laserBounds.right && enemyBounds.right >= laserBounds.left &&
-			    (result == null || result.getImage().getBounds().bottom < enemyBounds.bottom))
-				result = enemy;
-		}
-		return result;
-	}
-	
-	/**
-	 * Animates the {@link com.example.spaceship.classes.PlayerSpaceship player's spaceship}
-	 * movement from one edge of the screen to the other
-	 *
-	 * @param left a parameter that indicates whether the
-	 *             {@link com.example.spaceship.classes.PlayerSpaceship
-	 *             spaceship} should move left or right.
-	 */
-	
-	private void animateSpaceship (boolean left) {
-		final Rect bounds = dPlayer.getBounds();
-		int width = Math.abs(bounds.width());
-		ValueAnimator animator = ValueAnimator.ofInt(bounds.left, left ? 0 : getWidth() - width);
-		
-		animator.setDuration(1000);
-		
-		animator.addUpdateListener(animation -> {
-			final Object animatedValue = animation.getAnimatedValue();
-			assert dPlayer != null : "dPlayer mustn't be null";
-			dPlayer.setBounds((int) animatedValue,
-			                  bounds.top,
-			                  (int) animatedValue + width,
-			                  bounds.bottom);
-			invalidate();
-		});
-		animator.start();
-	}
-	
-	/**
-	 * Initializes the laser by setting its coordinates to the gun of the spaceship.
-	 */
-	
-	private void initLaser () {
-		final Rect bounds = dPlayer.getBounds();
-		laser.setBounds(bounds.centerX() - 30,
-		                bounds.top - 110,
-		                bounds.centerX() + 30,
-		                bounds.top - 10);
-	}
-	
-	/**
-	 * The text that announces that the game is over and that the user has won.
-	 *
-	 * @param canvas the canvas on which the text is drawn.
-	 */
-	
-	private void winText (Canvas canvas) {
-		TextPaint winPaint = new TextPaint();
-		winPaint.setColor(Color.GREEN);
-		winPaint.setTextSize(36);
-		winPaint.setTextAlign(Paint.Align.CENTER);
-		winPaint.setTypeface(Typeface.DEFAULT_BOLD);
-		
-		canvas.drawText("You won!", (float) getWidth() / 2, (float) getHeight() / 2, winPaint);
-		restartText(canvas);
 	}
 	
 	/**
@@ -644,6 +566,73 @@ public class GameView extends View {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Animates the {@link com.example.spaceship.classes.PlayerSpaceship player's spaceship}
+	 * movement from one edge of the screen to the other
+	 *
+	 * @param left a parameter that indicates whether the
+	 *             {@link com.example.spaceship.classes.PlayerSpaceship
+	 *             spaceship} should move left or right.
+	 */
+	
+	private void animateSpaceship (boolean left) {
+		final Rect bounds = dPlayer.getBounds();
+		int width = Math.abs(bounds.width());
+		ValueAnimator animator = ValueAnimator.ofInt(bounds.left, left ? 0 : getWidth() - width);
+		
+		animator.setDuration(1000);
+		
+		animator.addUpdateListener(animation -> {
+			final Object animatedValue = animation.getAnimatedValue();
+			assert dPlayer != null : "dPlayer mustn't be null";
+			dPlayer.setBounds((int) animatedValue,
+			                  bounds.top,
+			                  (int) animatedValue + width,
+			                  bounds.bottom);
+			invalidate();
+		});
+		animator.start();
+	}
+	
+	/**
+	 * Initializes the laser by setting its coordinates to the gun of the spaceship.
+	 */
+	
+	private void initLaser () {
+		final Rect bounds = dPlayer.getBounds();
+		laser.setBounds(bounds.centerX() - 30,
+		                bounds.top - 110,
+		                bounds.centerX() + 30,
+		                bounds.top - 10);
+	}
+	
+	/**
+	 * Calculates the {@link com.example.spaceship.classes.EnemySpaceship spaceship} that the laser
+	 * hits and returns that {@link com.example.spaceship.classes.EnemySpaceship spaceship}.
+	 *
+	 * @return the {@link com.example.spaceship.classes.EnemySpaceship spaceship} that the laser
+	 * 		will hit. Null if laser's X coordinate is not in range of any {@link
+	 *        com.example.spaceship.classes.EnemySpaceship spaceship}
+	 */
+	
+	private EnemySpaceship laserTarget () {
+		if (enemies == null || enemies.length <= 0 || laser == null)
+			return null;
+		
+		EnemySpaceship result = null;
+		
+		for (EnemySpaceship enemy : enemies) {
+			final Rect enemyBounds = enemy.getImage().getBounds();
+			final Rect laserBounds = laser.getBounds();
+			
+			if (enemyBounds.left <= laserBounds.right &&
+			    enemyBounds.right >= laserBounds.left &&
+			    (result == null || result.getImage().getBounds().bottom < enemyBounds.bottom))
+				result = enemy;
+		}
+		return result;
 	}
 	
 	/**

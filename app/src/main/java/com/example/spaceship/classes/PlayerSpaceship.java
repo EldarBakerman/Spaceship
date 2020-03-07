@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable;
 
 public class PlayerSpaceship extends Spaceship {
 	
-	private static final int DEFAULT_HP = 15;
+	static final int DEFAULT_HP = 15;
 	private static Weapon equippedWeapon;
 	private Weapon weapon;
 	
@@ -16,6 +16,10 @@ public class PlayerSpaceship extends Spaceship {
 		this.weapon  = Weapon.WEAPON_0;
 		this.weapon.setEquipped(true);
 		PlayerSpaceship.equippedWeapon = this.weapon;
+	}
+	
+	public PlayerSpaceship (long id, int type) {
+		super(id, type);
 	}
 	
 	public PlayerSpaceship (Drawable image) {
@@ -61,10 +65,6 @@ public class PlayerSpaceship extends Spaceship {
 		return weapon;
 	}
 	
-	public void updateWeapon () {
-		this.setWeapon(equippedWeapon);
-	}
-	
 	public void setWeapon (Weapon weapon) {
 		if (!weapon.isOwned())
 			throw new AssertionError("weapon isn't owned");
@@ -73,5 +73,9 @@ public class PlayerSpaceship extends Spaceship {
 		this.weapon = weapon;
 		this.weapon.setEquipped(true);
 		PlayerSpaceship.equippedWeapon = this.weapon;
+	}
+	
+	public void updateWeapon () {
+		this.setWeapon(equippedWeapon);
 	}
 }

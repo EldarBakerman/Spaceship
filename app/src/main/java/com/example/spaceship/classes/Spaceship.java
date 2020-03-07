@@ -7,6 +7,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import static android.view.View.INVISIBLE;
+import static com.example.spaceship.classes.PlayerSpaceship.DEFAULT_HP;
 
 public class Spaceship {
 	
@@ -15,9 +16,11 @@ public class Spaceship {
 	protected RectF healthbar;
 	protected TextView hpText;
 	protected RelativeLayout hpLayout;
+	private long id;
 	private int stage;
 	
 	public Spaceship () {
+		this.id        = -1;
 		this.image     = null;
 		this.hp        = -1;
 		this.hpTotal   = -1;
@@ -25,6 +28,7 @@ public class Spaceship {
 	}
 	
 	public Spaceship (Drawable image) {
+		this.id        = -1;
 		this.image     = image;
 		this.hp        = -1;
 		this.hpTotal   = -1;
@@ -41,7 +45,25 @@ public class Spaceship {
 		                   bounds.bottom + 50);
 	}
 	
+	public Spaceship (long id, int type) {
+		this.id = id;
+		if (this instanceof EnemySpaceship) {
+			EnemySpaceship.EnemyType enemyType = EnemySpaceship.EnemyType.valueOf("ENEMY_" + type);
+			this.hp      = enemyType.getHp();
+			this.hpTotal = enemyType.getHp();
+			((EnemySpaceship) this).setResource(enemyType.getResource());
+			((EnemySpaceship) this).setRarity(enemyType.getRarity());
+		} else if (this instanceof PlayerSpaceship) {
+			this.hp      = DEFAULT_HP;
+			this.hpTotal = DEFAULT_HP;
+			((PlayerSpaceship) this).setWeapon(Weapon.WEAPON_0);
+			PlayerSpaceship.setEquippedWeapon(Weapon.WEAPON_0);
+			((PlayerSpaceship) this).getWeapon().setEquipped(true);
+		}
+	}
+	
 	public Spaceship (Drawable image, int hp) {
+		this.id        = -1;
 		this.image     = image;
 		this.hp        = hp;
 		this.hpTotal   = hp;
@@ -50,6 +72,7 @@ public class Spaceship {
 	}
 	
 	public Spaceship (Drawable image, int hp, int hpTotal) {
+		this.id        = -1;
 		this.image     = image;
 		this.hp        = hp;
 		this.hpTotal   = hpTotal;
@@ -58,6 +81,7 @@ public class Spaceship {
 	}
 	
 	public Spaceship (Drawable image, int hp, int hpTotal, RectF healthbar) {
+		this.id        = -1;
 		this.image     = image;
 		this.hp        = hp;
 		this.hpTotal   = hpTotal;
@@ -66,6 +90,7 @@ public class Spaceship {
 	
 	public Spaceship (Drawable image, int hp, int hpTotal, RectF healthbar, TextView hpText,
 	                  RelativeLayout hpLayout) {
+		this.id        = -1;
 		this.image     = image;
 		this.hp        = hp;
 		this.hpTotal   = hpTotal;
@@ -76,6 +101,7 @@ public class Spaceship {
 	
 	public Spaceship (Drawable image, Drawable explosion, int hp, int hpTotal, RectF healthbar,
 	                  TextView hpText, RelativeLayout hpLayout) {
+		this.id        = -1;
 		this.image     = image;
 		this.explosion = explosion;
 		this.hp        = hp;
@@ -204,5 +230,13 @@ public class Spaceship {
 	public void setExplosion (Drawable explosion, int stage) {
 		setExplosion(explosion);
 		setExplosion(stage);
+	}
+	
+	public long getId () {
+		return id;
+	}
+	
+	public void setId (long id) {
+		this.id = id;
 	}
 }
