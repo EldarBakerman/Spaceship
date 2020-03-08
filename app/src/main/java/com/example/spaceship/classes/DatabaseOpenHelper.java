@@ -364,8 +364,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 			return new Weapon(weaponId,
 			                  weaponName,
 			                  weaponDamage,
-			                  weaponSpeed,
-			                  weaponPrice, weaponOwned, weaponEquipped);
+			                  weaponSpeed, weaponPrice, weaponOwned, weaponEquipped);
 	}
 	
 	/**
@@ -605,6 +604,86 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		
 		cursor.close();
 		return spaceships;
+	}
+	
+	/**
+	 * Update the corresponding {@link com.example.spaceship.classes.User user} in the database.
+	 *
+	 * @param user the new instance of {@link com.example.spaceship.classes.User user} to put into
+	 *             the database.
+	 *
+	 * @return the long value of the {@link android.database.sqlite.SQLiteDatabase#update(String,
+	 *        android.content.ContentValues, String, String[])} method.
+	 */
+	
+	public long updateUser (User user) {
+		ContentValues values = new ContentValues();
+		values.put(DatabaseOpenHelper.USERS_COLUMN_ID, user.getId());
+		values.put(DatabaseOpenHelper.USERS_COLUMN_NAME, user.getName());
+		// TODO: Blob/String/Bitmap
+		// values.put(DatabaseOpenHelper.USERS_COLUMN_PICTURE, user.getPicture());
+		values.put(DatabaseOpenHelper.USERS_COLUMN_POINTS, user.getPoints());
+		values.put(DatabaseOpenHelper.USERS_COLUMN_HIGHSCORE, user.getHighscore());
+		
+		return database.update(DatabaseOpenHelper.TABLE_USERS,
+		                       values,
+		                       DatabaseOpenHelper.USERS_COLUMN_ID + " = " + user.getId(),
+		                       null);
+	}
+	
+	/**
+	 * Update the corresponding {@link com.example.spaceship.classes.Weapon weapon} in the
+	 * database.
+	 *
+	 * @param weapon the new instance of {@link com.example.spaceship.classes.Weapon weapon}
+	 *               to put into
+	 *               the database.
+	 *
+	 * @return the long value of the {@link android.database.sqlite.SQLiteDatabase#update(String,
+	 *        android.content.ContentValues, String, String[])} method.
+	 */
+	
+	public long updateWeapon (Weapon weapon) {
+		ContentValues values = new ContentValues();
+		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_ID, weapon.getId());
+		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_NAME, weapon.getName());
+		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_PRICE, weapon.getPrice());
+		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_DAMAGE, weapon.getDamage());
+		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_SPEED, weapon.getSpeed());
+		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_OWNED, weapon.isOwned());
+		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_EQUIPPED, weapon.isEquipped());
+		
+		return database.update(DatabaseOpenHelper.TABLE_WEAPONS,
+		                       values,
+		                       DatabaseOpenHelper.WEAPONS_COLUMN_ID + " = " + weapon.getId(),
+		                       null);
+	}
+	
+	/**
+	 * Update the corresponding {@link com.example.spaceship.classes.Spaceship spaceship} in the
+	 * database.
+	 *
+	 * @param spaceship the new instance of {@link com.example.spaceship.classes.Spaceship
+	 *                  spaceship}
+	 *                  to put into
+	 *                  the database.
+	 *
+	 * @return the long value of the {@link android.database.sqlite.SQLiteDatabase#update(String,
+	 *        android.content.ContentValues, String, String[])} method.
+	 */
+	
+	public long updateSpaceship (Spaceship spaceship) {
+		ContentValues values = new ContentValues();
+		values.put(DatabaseOpenHelper.SPACESHIPS_COLUMN_ID, spaceship.getId());
+		values.put(DatabaseOpenHelper.SPACESHIPS_COLUMN_TYPE,
+		           spaceship instanceof EnemySpaceship
+		           ? ((EnemySpaceship) spaceship).getType()
+		           : 0);
+		
+		return database.update(DatabaseOpenHelper.TABLE_SPACESHIPS,
+		                       values,
+		                       DatabaseOpenHelper.SPACESHIPS_COLUMN_ID + " = " + spaceship.getId(),
+		                       null);
 	}
 	
 	/**
