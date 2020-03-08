@@ -365,8 +365,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 			                  weaponName,
 			                  weaponDamage,
 			                  weaponSpeed,
-			                  weaponPrice,
-			                  weaponOwned, weaponEquipped);
+			                  weaponPrice, weaponOwned, weaponEquipped);
 	}
 	
 	/**
@@ -414,7 +413,8 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 			long userId = cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_ID));
 			String userName =
 					cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_NAME));
-			// TODO: Blob, Bitmap or String
+			// TODO: Blob, B
+			//  itmap or String
 			int userPoints =
 					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_POINTS));
 			int userHighscore =
@@ -489,9 +489,30 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		return weapons;
 	}
 	
+	/**
+	 * Returns the desired {@link com.example.spaceship.classes.Spaceship spaceship} from the
+	 * database.
+	 *
+	 * @param spaceship the instance of the desired {@link com.example.spaceship.classes.Spaceship
+	 *                  spaceship}.
+	 *
+	 * @return the desired {@link com.example.spaceship.classes.Spaceship spaceship} from the
+	 * 		database.
+	 */
+	
 	public Spaceship getSpaceship (Spaceship spaceship) {
 		return getSpaceship(spaceship.getId());
 	}
+	
+	/**
+	 * Returns the desired {@link com.example.spaceship.classes.Spaceship spaceship} from the
+	 * database.
+	 *
+	 * @param id the id of the desired {@link com.example.spaceship.classes.Spaceship spaceship}.
+	 *
+	 * @return the desired {@link com.example.spaceship.classes.Spaceship spaceship} from the
+	 * 		database.
+	 */
 	
 	public Spaceship getSpaceship (long id) {
 		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_SPACESHIPS,
@@ -517,6 +538,14 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		       : new PlayerSpaceship(spaceshipId, spaceshipType);
 	}
 	
+	/**
+	 * Removes a spaceship from the database.
+	 *
+	 * @param spaceship the spaceship instance to remove from the database.
+	 *
+	 * @return the spaceship that was removed.
+	 */
+	
 	public Spaceship deleteSpaceship (Spaceship spaceship) {
 		Spaceship res = getSpaceship(spaceship.getId());
 		database.delete(DatabaseOpenHelper.TABLE_SPACESHIPS,
@@ -525,6 +554,15 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		return res;
 	}
 	
+	/**
+	 * Removes a {@link  com.example.spaceship.classes.Spaceship spaceship} from the database.
+	 *
+	 * @param id the id of the {@link  com.example.spaceship.classes.Spaceship spaceship} to remove
+	 *           from the database.
+	 *
+	 * @return the {@link  com.example.spaceship.classes.Spaceship spaceship} that was removed.
+	 */
+	
 	public Spaceship deleteSpaceship (long id) {
 		Spaceship res = getSpaceship(id);
 		database.delete(DatabaseOpenHelper.TABLE_SPACESHIPS,
@@ -532,6 +570,14 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		                null);
 		return res;
 	}
+	
+	/**
+	 * Returns a {@link java.util.List<com.example.spaceship.classes.Spaceship> list} of all the
+	 * spaceships from the database.
+	 *
+	 * @return a {@link java.util.List<com.example.spaceship.classes.Spaceship> list} of all the
+	 * 		spaceships from the database.
+	 */
 	
 	public List<Spaceship> getAllSpaceships () {
 		List<Spaceship> spaceships = new ArrayList<>();
@@ -561,12 +607,31 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		return spaceships;
 	}
 	
+	/**
+	 * Actions to perform when the {@link android.database.sqlite.SQLiteDatabase database} is
+	 * created. Creates and initializes all tables.
+	 *
+	 * @param db the {@link android.database.sqlite.SQLiteDatabase database} that was created.
+	 */
+	
 	@Override
 	public void onCreate (SQLiteDatabase db) {
 		db.execSQL(CREATE_TABLE_USERS);
 		db.execSQL(CREATE_TABLE_WEAPONS);
 		db.execSQL(CREATE_TABLE_SPACESHIPS);
 	}
+	
+	/**
+	 * Actions to perform when the {@link android.database.sqlite.SQLiteDatabase database} is
+	 * updated. Removes the tables and creates new tables with the new information.
+	 *
+	 * @param db         the {@link android.database.sqlite.SQLiteDatabase database} that was
+	 *                   updated.
+	 * @param oldVersion the old version's number.
+	 * @param newVersion the new version's number.
+	 *
+	 * @see com.example.spaceship.classes.DatabaseOpenHelper#onCreate(android.database.sqlite.SQLiteDatabase)
+	 */
 	
 	@Override
 	public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
