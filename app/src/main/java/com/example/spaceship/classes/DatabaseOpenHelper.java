@@ -15,7 +15,7 @@ import java.util.List;
  * SQLite Database class that manages the Database of the app
  */
 
-abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
+public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	// General Database Values
 	private static final String TABLE_SPACESHIPS = "spaceships_table";
@@ -363,8 +363,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		} else
 			return new Weapon(weaponId,
 			                  weaponName,
-			                  weaponDamage,
-			                  weaponSpeed, weaponPrice, weaponOwned, weaponEquipped);
+			                  weaponDamage, weaponSpeed, weaponPrice, weaponOwned, weaponEquipped);
 	}
 	
 	/**
@@ -533,8 +532,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 		
 		cursor.close();
 		return spaceshipType > 0
-		       ? new EnemySpaceship(spaceshipId, spaceshipType)
-		       : new PlayerSpaceship(spaceshipId, spaceshipType);
+		       ? new EnemySpaceship(spaceshipId, spaceshipType) : new PlayerSpaceship(spaceshipId);
 	}
 	
 	/**
@@ -599,7 +597,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 			
 			spaceships.add(spaceshipType > 0
 			               ? new EnemySpaceship(spaceshipId, spaceshipType)
-			               : new PlayerSpaceship(spaceshipId, spaceshipType));
+			               : new PlayerSpaceship(spaceshipId));
 		}
 		
 		cursor.close();
@@ -616,7 +614,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 *        android.content.ContentValues, String, String[])} method.
 	 */
 	
-	public long updateUser (User user) {
+	public long update (User user) {
 		ContentValues values = new ContentValues();
 		values.put(DatabaseOpenHelper.USERS_COLUMN_ID, user.getId());
 		values.put(DatabaseOpenHelper.USERS_COLUMN_NAME, user.getName());
@@ -643,7 +641,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 *        android.content.ContentValues, String, String[])} method.
 	 */
 	
-	public long updateWeapon (Weapon weapon) {
+	public long update (Weapon weapon) {
 		ContentValues values = new ContentValues();
 		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_ID, weapon.getId());
 		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_NAME, weapon.getName());
@@ -672,7 +670,7 @@ abstract class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 *        android.content.ContentValues, String, String[])} method.
 	 */
 	
-	public long updateSpaceship (Spaceship spaceship) {
+	public long update (Spaceship spaceship) {
 		ContentValues values = new ContentValues();
 		values.put(DatabaseOpenHelper.SPACESHIPS_COLUMN_ID, spaceship.getId());
 		values.put(DatabaseOpenHelper.SPACESHIPS_COLUMN_TYPE,
