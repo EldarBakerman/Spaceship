@@ -1,5 +1,7 @@
 package com.example.spaceship.classes;
 
+import android.graphics.Bitmap;
+
 /**
  * The User class that holds the Player's information such as name, profile picture, current amount
  * of points and highscore.
@@ -7,7 +9,6 @@ package com.example.spaceship.classes;
 
 public class User {
 	
-	// TODO: Profile pic of camera
 	// TODO: User Registration Activity/Dialog
 	
 	/**
@@ -23,8 +24,15 @@ public class User {
 	private String name;
 	
 	/**
+	 * The user's profile picture.
+	 */
+	
+	private Bitmap image;
+	
+	/**
 	 * The user's amount of points.
 	 */
+	
 	
 	private int points;
 	
@@ -43,6 +51,7 @@ public class User {
 		this.name      = "";
 		this.points    = 0;
 		this.highscore = 0;
+		this.image     = null;
 	}
 	
 	/**
@@ -51,17 +60,20 @@ public class User {
 	 * @param name      the user's name.
 	 * @param points    the user's amount of points.
 	 * @param highscore the user's highscore.
+	 * @param image     the user's profile picture.
 	 *
 	 * @see com.example.spaceship.classes.User#name
 	 * @see com.example.spaceship.classes.User#points
 	 * @see com.example.spaceship.classes.User#highscore
+	 * @see com.example.spaceship.classes.User#image
 	 */
 	
-	public User (String name, int points, int highscore) {
+	public User (Bitmap image, String name, int points, int highscore) {
 		this.id        = -1;
 		this.name      = name;
 		this.points    = points;
 		this.highscore = highscore;
+		this.image     = image;
 	}
 	
 	/**
@@ -71,19 +83,22 @@ public class User {
 	 * @param name      the user's name.
 	 * @param points    the user's amount of points.
 	 * @param highscore the user's highscore.
+	 * @param image     the user's profile picture.
 	 *
 	 * @see com.example.spaceship.classes.User#id
 	 * @see com.example.spaceship.classes.User#name
 	 * @see com.example.spaceship.classes.User#points
 	 * @see com.example.spaceship.classes.User#highscore
+	 * @see com.example.spaceship.classes.User#image
 	 */
 	
 	// TODO: String/Blob/Bitmap parameter
-	public User (long id, String name, int points, int highscore) {
+	public User (long id, Bitmap image, String name, int points, int highscore) {
 		this.id        = id;
 		this.name      = name;
 		this.points    = points;
 		this.highscore = highscore;
+		this.image     = image;
 	}
 	
 	/**
@@ -180,5 +195,13 @@ public class User {
 	
 	public void setName (String name) {
 		this.name = name;
+	}
+	
+	public Bitmap getImage () {
+		return image;
+	}
+	
+	public void setImage (Bitmap image) {
+		this.image = image;
 	}
 }

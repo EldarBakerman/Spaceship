@@ -59,7 +59,7 @@ public class EnemySpaceship extends Spaceship {
 	 */
 	
 	public EnemySpaceship (EnemyType type) {
-		// TODO: super()?
+		super();
 		this.hp       = type.hp;
 		this.hpTotal  = type.hp;
 		this.resource = type.resource;
@@ -169,9 +169,7 @@ public class EnemySpaceship extends Spaceship {
 	public enum EnemyType {
 		// TODO: Flip vertically
 		ENEMY_1(R.drawable.spaceship2, 5, 1),
-		ENEMY_2(R.drawable.spaceship3, 10, 2),
-		ENEMY_3(R.drawable.spaceship4, 20, 3),
-		ENEMY_4(R.drawable.spaceship5, 30, 4);
+		ENEMY_2(R.drawable.spaceship3, 10, 2), ENEMY_3(R.drawable.spaceship4, 15, 3);
 		
 		/**
 		 * The spaceship's image resource.

@@ -65,13 +65,29 @@ public class Spaceship {
 	 * The spaceship's Database ID.
 	 */
 	
-	private long id;
+	protected long id;
 	
 	/**
 	 * The spaceship's explosion stage.
 	 */
 	
 	private int stage;
+	
+	/**
+	 * Indicates whether a spaceship is currently exploding or not.
+	 * Updates with the calls for any method that updates the
+	 * {@link com.example.spaceship.classes.Spaceship#explosion}
+	 * field.
+	 *
+	 * @see com.example.spaceship.classes.Spaceship#explosion
+	 * @see com.example.spaceship.classes.Spaceship#setExplosion(int)
+	 * @see com.example.spaceship.classes.Spaceship#setExplosion(android.graphics.drawable.Drawable)
+	 * @see com.example.spaceship.classes.Spaceship#setExplosion(android.graphics.drawable.Drawable,
+	 *        int)
+	 * @see Spaceship#updateExplosion()
+	 */
+	
+	private boolean exploding;
 	
 	/**
 	 * The default constructor that sets the spaceship's fields to their default values.
@@ -213,7 +229,8 @@ public class Spaceship {
 	 * @param hpLayout  the spaceship's {@link android.widget.RelativeLayout hpLayout}.
 	 */
 	
-	public Spaceship (Drawable image, int hp, int hpTotal, RectF healthbar, TextView hpText, RelativeLayout hpLayout) {
+	public Spaceship (Drawable image, int hp, int hpTotal, RectF healthbar, TextView hpText,
+	                  RelativeLayout hpLayout) {
 		this.id        = -1;
 		this.image     = image;
 		this.hp        = hp;
@@ -236,7 +253,8 @@ public class Spaceship {
 	 * @param hpLayout  the spaceship's {@link android.widget.RelativeLayout hpLayout}.
 	 */
 	
-	public Spaceship (Drawable image, Drawable explosion, int hp, int hpTotal, RectF healthbar, TextView hpText, RelativeLayout hpLayout) {
+	public Spaceship (Drawable image, Drawable explosion, int hp, int hpTotal, RectF healthbar,
+	                  TextView hpText, RelativeLayout hpLayout) {
 		this.id        = -1;
 		this.image     = image;
 		this.explosion = explosion;
@@ -448,16 +466,16 @@ public class Spaceship {
 	}
 	
 	/**
-	 * Sets the spaceship's {@link android.graphics.drawable.Drawable explosion} to the new {@link
-	 * android.graphics.drawable.Drawable explosion}.
-	 *
-	 * @param explosion the new {@link android.graphics.drawable.Drawable explosion}.
+	 * Updates the spaceship's explosion to be in accordance to the stage.
 	 *
 	 * @see com.example.spaceship.classes.Spaceship#explosion
+	 * @see com.example.spaceship.classes.Spaceship#stage
+	 * @see com.example.spaceship.classes.Spaceship#setExplosion(int)
 	 */
 	
-	public void setExplosion (Drawable explosion) {
-		this.explosion = explosion;
+	public void updateExplosion () {
+		setExplosion(stage);
+		this.exploding = true;
 	}
 	
 	/**
@@ -476,7 +494,8 @@ public class Spaceship {
 			return;
 		}
 		
-		this.stage = stage;
+		this.stage     = stage;
+		this.exploding = true;
 		
 		final Rect bounds = this.image.getBounds();
 		final int width = bounds.width();
@@ -510,18 +529,6 @@ public class Spaceship {
 	}
 	
 	/**
-	 * Updates the spaceship's explosion to be in accordance to the stage.
-	 *
-	 * @see com.example.spaceship.classes.Spaceship#explosion
-	 * @see com.example.spaceship.classes.Spaceship#stage
-	 * @see com.example.spaceship.classes.Spaceship#setExplosion(int)
-	 */
-	
-	public void updateExplosion () {
-		setExplosion(stage);
-	}
-	
-	/**
 	 * Sets the spaceship's {@link android.graphics.drawable.Drawable explosion} to the new {@link
 	 * android.graphics.drawable.Drawable explosion} and updates its size and image to be in
 	 * accordance to the new stage.
@@ -536,6 +543,21 @@ public class Spaceship {
 	public void setExplosion (Drawable explosion, int stage) {
 		setExplosion(explosion);
 		setExplosion(stage);
+		this.exploding = true;
+	}
+	
+	/**
+	 * Sets the spaceship's {@link android.graphics.drawable.Drawable explosion} to the new {@link
+	 * android.graphics.drawable.Drawable explosion}.
+	 *
+	 * @param explosion the new {@link android.graphics.drawable.Drawable explosion}.
+	 *
+	 * @see com.example.spaceship.classes.Spaceship#explosion
+	 */
+	
+	public void setExplosion (Drawable explosion) {
+		this.explosion = explosion;
+		this.exploding = true;
 	}
 	
 	/**
@@ -560,6 +582,18 @@ public class Spaceship {
 	
 	public void setId (long id) {
 		this.id = id;
+	}
+	
+	/**
+	 * Returns the value of {@link com.example.spaceship.classes.Spaceship#exploding}
+	 *
+	 * @return the value of {@link com.example.spaceship.classes.Spaceship#exploding}
+	 *
+	 * @see com.example.spaceship.classes.Spaceship#exploding
+	 */
+	
+	public boolean isExploding () {
+		return this.exploding;
 	}
 }
 

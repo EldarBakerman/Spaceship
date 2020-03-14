@@ -111,7 +111,9 @@ public class Weapon {
 		this.owned    = owned;
 		this.equipped = equipped && owned;
 		weapons.add(this);
-		if (SplashActivity.database != null && SplashActivity.database.getAllWeapons().size() > 0)
+		if (SplashActivity.database != null &&
+		    SplashActivity.database.getAllWeapons() != null &&
+		    SplashActivity.database.getAllWeapons().size() > 0)
 			SplashActivity.database.update(this);
 	}
 	
@@ -136,7 +138,9 @@ public class Weapon {
 		this.speed  = speed;
 		this.price  = price;
 		weapons.add(this);
-		if (SplashActivity.database != null && SplashActivity.database.getAllWeapons().size() > 0)
+		if (SplashActivity.database != null &&
+		    SplashActivity.database.getAllWeapons() != null &&
+		    SplashActivity.database.getAllWeapons().size() > 0)
 			SplashActivity.database.update(this);
 	}
 	
@@ -164,7 +168,9 @@ public class Weapon {
 		this.image  = image;
 		this.price  = price;
 		weapons.add(this);
-		if (SplashActivity.database != null && SplashActivity.database.getAllWeapons().size() > 0)
+		if (SplashActivity.database != null &&
+		    SplashActivity.database.getAllWeapons() != null &&
+		    SplashActivity.database.getAllWeapons().size() > 0)
 			SplashActivity.database.update(this);
 	}
 	

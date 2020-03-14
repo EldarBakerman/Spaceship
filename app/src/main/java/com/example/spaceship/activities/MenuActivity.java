@@ -17,10 +17,14 @@ public class MenuActivity extends AppCompatActivity {
 	}
 	
 	public void startGame (View view) {
-		startActivity(new Intent(MenuActivity.this, GameActivity.class));
+		Intent intent = new Intent(MenuActivity.this, GameActivity.class);
+		intent.putExtra("userId", getIntent().getLongExtra("userId", -1));
+		startActivity(intent);
 	}
 	
 	public void startStore (View view) {
-		startActivity(new Intent(MenuActivity.this, StoreActivity.class));
+		Intent intent = new Intent(MenuActivity.this, StoreActivity.class);
+		intent.putExtra("userId", getIntent().getLongExtra("userId", -1));
+		startActivity(intent);
 	}
 }
