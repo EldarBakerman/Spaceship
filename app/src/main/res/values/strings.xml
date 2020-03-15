@@ -8,5 +8,6 @@
 	<string name="damage">"Damage: "</string>
 	<string name="speed">"Speed: "</string>
 	<string name="take_photo">Take photo</string>
-	<string name="Points">"Points: "</string>
+	<string name="points">"POINTS : "</string>
+	<string name="time">"TIME: "</string>
 </resources>

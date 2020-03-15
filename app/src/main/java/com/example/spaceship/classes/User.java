@@ -197,9 +197,26 @@ public class User {
 		this.name = name;
 	}
 	
+	/**
+	 * Returns the user's {@link android.graphics.Bitmap image}.
+	 *
+	 * @return the user's {@link android.graphics.Bitmap image}.
+	 *
+	 * @see com.example.spaceship.classes.User#image
+	 */
+	
 	public Bitmap getImage () {
 		return image;
 	}
+	
+	/**
+	 * Sets the user's {@link android.graphics.Bitmap image} to the new {@link
+	 * android.graphics.Bitmap image}.
+	 *
+	 * @param image the new {@link android.graphics.Bitmap image}
+	 *
+	 * @see com.example.spaceship.classes.User#image
+	 */
 	
 	public void setImage (Bitmap image) {
 		this.image = image;

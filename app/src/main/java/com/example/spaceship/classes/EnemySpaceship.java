@@ -169,7 +169,8 @@ public class EnemySpaceship extends Spaceship {
 	public enum EnemyType {
 		// TODO: Flip vertically
 		ENEMY_1(R.drawable.spaceship2, 5, 1),
-		ENEMY_2(R.drawable.spaceship3, 10, 2), ENEMY_3(R.drawable.spaceship4, 15, 3);
+		ENEMY_2(R.drawable.spaceship3, 10, 2),
+		ENEMY_3(R.drawable.spaceship4, 15, 3);
 		
 		/**
 		 * The spaceship's image resource.

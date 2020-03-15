@@ -34,8 +34,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	private static final String USERS_COLUMN_POINTS = "points";
 	private static final String USERS_COLUMN_HIGHSCORE = "highscore";
 	private static final String[] USERS_COLUMNS = {
-			USERS_COLUMN_ID,
-			USERS_COLUMN_NAME, USERS_COLUMN_IMAGE,
+			USERS_COLUMN_ID, USERS_COLUMN_NAME, USERS_COLUMN_IMAGE,
 			USERS_COLUMN_POINTS,
 			USERS_COLUMN_HIGHSCORE
 	};
@@ -71,7 +70,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	                                                 USERS_COLUMN_ID +
 	                                                 " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 	                                                 USERS_COLUMN_NAME +
-	                                                 " TEXT, " + USERS_COLUMN_IMAGE +
+	                                                 " TEXT, " +
+	                                                 USERS_COLUMN_IMAGE +
 	                                                 " BLOB, " +
 	                                                 USERS_COLUMN_POINTS +
 	                                                 " INTEGER, " +
@@ -449,10 +449,12 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			return null;
 		
 		while (cursor.moveToNext()) {
-			long userId = cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_ID));
+			long userId =
+					cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_ID));
 			String userName =
 					cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_NAME));
-			byte[] userImage = cursor.getBlob(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_IMAGE));
+			byte[] userImage =
+					cursor.getBlob(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_IMAGE));
 			int userPoints =
 					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_POINTS));
 			int userHighscore =
@@ -669,7 +671,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		
 		return database.update(DatabaseOpenHelper.TABLE_USERS,
 		                       values,
-		                       DatabaseOpenHelper.USERS_COLUMN_ID + " = " + user.getId(), null);
+		                       DatabaseOpenHelper.USERS_COLUMN_ID + " = " + user.getId(),
+		                       null);
 	}
 	
 	/**

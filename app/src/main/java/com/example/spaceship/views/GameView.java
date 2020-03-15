@@ -35,6 +35,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.example.spaceship.classes.EnemySpaceship.EnemyType;
 
@@ -55,7 +56,7 @@ public class GameView extends View {
 	private TextView timerText;
 	private Drawable dPlayer;
 	// Boolean Checkers
-	private boolean start = true;
+	private AtomicBoolean start = new AtomicBoolean(true);
 	private boolean timerTick = false;
 	private boolean tapped = false;
 	private boolean laserAnimating = false;
@@ -69,6 +70,7 @@ public class GameView extends View {
 	private Paint hbFill;
 	//TODO: User & Database
 	private User user;
+	private Random random = new Random();
 	
 	
 	/**
@@ -86,7 +88,9 @@ public class GameView extends View {
 		
 		// User
 		
-		user = SplashActivity.database.getUser(activity.getIntent().getLongExtra("userId", -1));
+		user   = SplashActivity.database.getUser(activity.getIntent().getLongExtra("userId", -1));
+		points = activity.getIntent().getIntExtra("points", 0);
+		
 		
 		// Player
 		player   = new PlayerSpaceship(getResources().getDrawable(R.drawable.spaceship1, null));
@@ -111,26 +115,33 @@ public class GameView extends View {
 		timerText = new TextView(context);
 		timerText.setGravity(Gravity.CENTER);
 		timerText.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-		timerText.setPadding(30, 0, 0, 0);
+		timerText.setPadding(0, 0, 50, 0);
 		timerText.setVisibility(VISIBLE);
 		timerText.setTextSize(22);
 		timerText.setText(String.format(Locale.ENGLISH, "%d", 30));
 		timerText.setTextColor(Color.WHITE);
 		timerText.setTypeface(null, Typeface.BOLD);
 		timerText.setLayoutParams(params);
+		timerText.setText(String.format(Locale.ENGLISH,
+		                                "%s%d",
+		                                getResources().getString(R.string.time),
+		                                30));
 		
 		// Points TextView
 		
 		pointsText = new TextView(context);
 		pointsText.setGravity(Gravity.CENTER);
 		setTextAlignment(TEXT_ALIGNMENT_CENTER);
-		setPadding(0, 0, 30, 0);
+		setPadding(0, 0, 50, 0);
 		setVisibility(VISIBLE);
 		pointsText.setTextSize(22);
-		pointsText.setText(String.format(Locale.ENGLISH, "%d", 0));
 		pointsText.setTextColor(Color.WHITE);
 		pointsText.setTypeface(null, Typeface.BOLD);
 		pointsText.setLayoutParams(params);
+		pointsText.setText(String.format(Locale.ENGLISH,
+		                                 "%s%d",
+		                                 getResources().getString(R.string.points),
+		                                 points));
 		
 		infoLayout.addView(timerText);
 		infoLayout.addView(pointsText);
@@ -155,14 +166,20 @@ public class GameView extends View {
 					return;
 				}
 				
-				int timeLeft = Integer.parseInt(timerText.getText().toString());
+				int timeLeft = Integer.parseInt(timerText.getText()
+				                                         .toString()
+				                                         .replace(getResources().getString(R.string.time),
+				                                                  ""));
 				if (timeLeft <= 0) {
 					explode(player);
 					invalidate();
 					timer.cancel();
 				} else {
 					activity.runOnUiThread(() -> {
-						timerText.setText(String.format(Locale.ENGLISH, "%d", timeLeft - 1));
+						timerText.setText(String.format(Locale.ENGLISH,
+						                                "%s%d",
+						                                getResources().getString(R.string.time),
+						                                timeLeft - 1));
 						timerTick = true;
 						postInvalidate();
 					});
@@ -208,7 +225,7 @@ public class GameView extends View {
 			points += 5;
 			pointsText.setText(String.format(Locale.ENGLISH,
 			                                 "%s%d",
-			                                 getContext().getString(R.string.Points),
+			                                 getResources().getString(R.string.points),
 			                                 points));
 		}
 	}
@@ -249,6 +266,25 @@ public class GameView extends View {
 	}
 	
 	/**
+	 * Executes {@link com.example.spaceship.views.GameView#performClick()} whenever the screen is
+	 * tapped.
+	 *
+	 * @param event the {@link android.view.MotionEvent motion event} data
+	 *
+	 * @return boolean used by the system
+	 */
+	
+	@Override
+	public boolean onTouchEvent (MotionEvent event) {
+		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			performClick();
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * {@link View#onDraw(Canvas) onDraw} method implemented from {@link View view} that draws the
 	 * entire game.
 	 *
@@ -260,7 +296,8 @@ public class GameView extends View {
 		super.onDraw(canvas);
 		
 		if (lost) {
-			start = timerTick = tapped = laserAnimating = miss = false;
+			start.getAndSet(false);
+			timerTick = tapped = laserAnimating = miss = false;
 			loseText(canvas);
 			return;
 		}
@@ -269,14 +306,14 @@ public class GameView extends View {
 			launchGame();
 		
 		// Animation
-		if (start) {
+		if (start.get()) {
+			start.getAndSet(false);
 			setBackgroundColor(Color.BLACK);
 			dPlayer.setBounds(getWidth() / 2 - 150,
 			                  getHeight() - 300,
 			                  getWidth() / 2 + 150,
 			                  getHeight() - 100);
-			start = false;
-			generateEnemies(new Random().nextInt(6) + 1);
+			generateEnemies(random.nextInt(6) + 1);
 		}
 		
 		for (EnemySpaceship enemy : enemies) {
@@ -293,7 +330,10 @@ public class GameView extends View {
 		
 		
 		if (timerTick) {
-			animateSpaceship(Integer.parseInt(timerText.getText().toString()) % 2 == 0);
+			animateSpaceship(Integer.parseInt(timerText.getText()
+			                                           .toString()
+			                                           .replace(getResources().getString(R.string.time),
+			                                                    "")) % 2 == 0);
 			timerTick = false;
 		}
 		
@@ -343,22 +383,6 @@ public class GameView extends View {
 	}
 	
 	/**
-	 * Launches a new game, if won, passes the points value to the new game and updates the
-	 * highscore of the {@link com.example.spaceship.classes.User user}.
-	 */
-	
-	private void launchGame () {
-		Activity activity = ((Activity) getContext());
-		Intent intent = new Intent(activity, GameActivity.class);
-		
-		if (win)
-			intent.putExtra("points", user.getPoints());
-		
-		activity.startActivity(intent);
-		activity.finish();
-	}
-	
-	/**
 	 * The text that announces that the game is over and that the user has lost.
 	 *
 	 * @param canvas the canvas on which the text is drawn.
@@ -374,6 +398,24 @@ public class GameView extends View {
 		canvas.drawText("Game Over!", (float) getWidth() / 2, (float) getHeight() / 2, losePaint);
 		
 		restartText(canvas);
+	}
+	
+	/**
+	 * Launches a new game, if won, passes the points value to the new game and updates the
+	 * highscore of the {@link com.example.spaceship.classes.User user}.
+	 */
+	
+	private void launchGame () {
+		Activity activity = ((Activity) getContext());
+		Intent intent = new Intent(activity, GameActivity.class);
+		
+		if (win)
+			intent.putExtra("points", user.getPoints());
+		
+		intent.putExtra("userId", user.getId());
+		
+		activity.startActivity(intent);
+		activity.finish();
 	}
 	
 	/**
@@ -394,11 +436,16 @@ public class GameView extends View {
 		if (amount > 6 || amount < 1)
 			throw new AssertionError("amount is invalid");
 		
+		// If method was called from constructor - exit (can't set coordinates if canvas
+		// hasn't loaded yet)
+		if (start.get())
+			throw new AssertionError("must be called only after canvas was initialized");
+		
 		enemies = new EnemySpaceship[amount];
 		
 		/* Chances array in order to generate chances in accordance to the rarity of the EnemyType
 		 * by creating an array of numbers representing the number of EnemyType.
-		 * Each number is appearing (5 - rarity) times in the array, then a number is chosen
+		 * Each number is appearing (4 - rarity) times in the array, then a number is chosen
 		 * randomly using the Random class. Since the appearance of some types in the array is
 		 * more frequent than others, it creates a chance in accordance to the rarity of the type.
 		 */
@@ -418,8 +465,8 @@ public class GameView extends View {
 			int[] oldChances = new int[oldLength];
 			System.arraycopy(chances, 0, oldChances, 0, oldLength);
 			
-			// Increase the length of the array by (5 - rarity)
-			chances = new int[oldLength + (5 - enemyType.getRarity())];
+			// Increase the length of the array by (4 - rarity)
+			chances = new int[oldLength + (4 - enemyType.getRarity())];
 			
 			// Retrieve the previous values to the new array
 			System.arraycopy(oldChances, 0, chances, 0, oldLength);
@@ -431,24 +478,17 @@ public class GameView extends View {
 		}
 		
 		// Use Random to set a pattern of coordinates for the ships (the amount of patterns is 2)
-		Random rPattern = new Random();
-		int pattern = rPattern.nextInt(2);
+		int pattern = random.nextInt(2);
 		
 		for (int i = 0; i < amount; i++) {
 			
 			// Use Random to generate the wanted amount of enemies randomly, in accordance to
 			// rarity
-			Random random = new Random();
 			enemies[i] = new EnemySpaceship(EnemyType.valueOf(String.format(Locale.ENGLISH,
 			                                                                "ENEMY_%d",
 			                                                                chances[random.nextInt(
 					                                                                chances.length)])));
 			enemies[i].setImage(getResources().getDrawable(enemies[i].getResource(), null));
-			
-			// If method was called from constructor - exit (can't set coordinates if canvas
-			// hasn't loaded yet)
-			if (start)
-				return;
 			
 			final int LEFT_EDGE = 0;
 			final int LEFT_MARGIN_EDGE = LEFT_EDGE + 100;
@@ -499,7 +539,6 @@ public class GameView extends View {
 					                CENTER_RIGHT,
 					                i >= 2 ? PREV_BOTTOM_MARGIN + HEIGHT : BOTTOM_MARGIN);
 			} else if (pattern == 1) {
-				
 				/*
 				 * Pattern 1 (enemy spaceships represented by 0):
 				 * If amount is odd (above 3 - below 3 is one line of enemies)
@@ -597,42 +636,6 @@ public class GameView extends View {
 	}
 	
 	/**
-	 * Animates the laser's movement from the {@link com.example.spaceship.classes.PlayerSpaceship
-	 * player spaceship's} gun to the {@link com.example.spaceship.classes.EnemySpaceship enemy
-	 * spaceship's} bottom coordinate or, if missed, the end of the screen.
-	 */
-	
-	private void animateLaser () {
-		initLaser();
-		
-		final Rect bounds = laser.getBounds();
-		final int height = Math.abs(bounds.height());
-		ValueAnimator animator;
-		
-		if (laserTarget() == null) {
-			animator = ValueAnimator.ofInt(bounds.top, -1 * height);
-			animator.setDuration(200);
-			miss = true;
-		} else {
-			final Rect targetBounds = Objects.requireNonNull(laserTarget()).getImage().getBounds();
-			animator = ValueAnimator.ofInt(bounds.top, targetBounds.bottom);
-			animator.setDuration(200 * (int) ((float) targetBounds.bottom / (float) getHeight()));
-			hit = laserTarget();
-		}
-		
-		animator.addUpdateListener(animation -> {
-			final Object animatedValue = animation.getAnimatedValue();
-			laser.setBounds(bounds.left,
-			                (int) animatedValue,
-			                bounds.right,
-			                (int) animatedValue + height);
-			laserAnimating = true;
-			invalidate();
-		});
-		animator.start();
-	}
-	
-	/**
 	 * Initializes the laser by setting its coordinates to the gun of the spaceship.
 	 */
 	
@@ -708,21 +711,39 @@ public class GameView extends View {
 	}
 	
 	/**
-	 * Executes {@link com.example.spaceship.views.GameView#performClick()} whenever the screen is
-	 * tapped.
-	 *
-	 * @param event the {@link android.view.MotionEvent motion event} data
-	 *
-	 * @return boolean used by the system
+	 * Animates the laser's movement from the {@link com.example.spaceship.classes.PlayerSpaceship
+	 * player spaceship's} gun to the {@link com.example.spaceship.classes.EnemySpaceship enemy
+	 * spaceship's} bottom coordinate or, if missed, the end of the screen.
 	 */
 	
-	@Override
-	public boolean onTouchEvent (MotionEvent event) {
-		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			performClick();
-			return true;
+	private void animateLaser () {
+		initLaser();
+		
+		final Rect bounds = laser.getBounds();
+		final int height = Math.abs(bounds.height());
+		ValueAnimator animator;
+		
+		if (laserTarget() == null) {
+			animator = ValueAnimator.ofInt(bounds.top, -1 * height);
+			animator.setDuration(200);
+			miss = true;
+		} else {
+			final Rect targetBounds = Objects.requireNonNull(laserTarget()).getImage().getBounds();
+			animator = ValueAnimator.ofInt(bounds.top, targetBounds.bottom);
+			animator.setDuration((int) (200 / ((float) getHeight() / (float) targetBounds.bottom)));
+			hit = laserTarget();
 		}
-		return false;
+		
+		animator.addUpdateListener(animation -> {
+			final Object animatedValue = animation.getAnimatedValue();
+			laser.setBounds(bounds.left,
+			                (int) animatedValue,
+			                bounds.right,
+			                (int) animatedValue + height);
+			laserAnimating = true;
+			invalidate();
+		});
+		animator.start();
 	}
 	
 	/**
@@ -780,7 +801,8 @@ public class GameView extends View {
 		
 		canvas.drawText("Tap anywhere to restart",
 		                (float) getWidth() / 2,
-		                (float) getHeight() / 2 + 100, restartPaint);
+		                (float) getHeight() / 2 + 100,
+		                restartPaint);
 	}
 }
 	

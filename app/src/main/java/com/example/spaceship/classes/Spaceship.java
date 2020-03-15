@@ -466,19 +466,6 @@ public class Spaceship {
 	}
 	
 	/**
-	 * Updates the spaceship's explosion to be in accordance to the stage.
-	 *
-	 * @see com.example.spaceship.classes.Spaceship#explosion
-	 * @see com.example.spaceship.classes.Spaceship#stage
-	 * @see com.example.spaceship.classes.Spaceship#setExplosion(int)
-	 */
-	
-	public void updateExplosion () {
-		setExplosion(stage);
-		this.exploding = true;
-	}
-	
-	/**
 	 * Sets the explosion's stage to the new stage and updates the {@link
 	 * com.example.spaceship.classes.Spaceship#explosion}'s image and size accordingly.
 	 *
@@ -530,6 +517,33 @@ public class Spaceship {
 	
 	/**
 	 * Sets the spaceship's {@link android.graphics.drawable.Drawable explosion} to the new {@link
+	 * android.graphics.drawable.Drawable explosion}.
+	 *
+	 * @param explosion the new {@link android.graphics.drawable.Drawable explosion}.
+	 *
+	 * @see com.example.spaceship.classes.Spaceship#explosion
+	 */
+	
+	public void setExplosion (Drawable explosion) {
+		this.explosion = explosion;
+		this.exploding = true;
+	}
+	
+	/**
+	 * Updates the spaceship's explosion to be in accordance to the stage.
+	 *
+	 * @see com.example.spaceship.classes.Spaceship#explosion
+	 * @see com.example.spaceship.classes.Spaceship#stage
+	 * @see com.example.spaceship.classes.Spaceship#setExplosion(int)
+	 */
+	
+	public void updateExplosion () {
+		setExplosion(stage);
+		this.exploding = true;
+	}
+	
+	/**
+	 * Sets the spaceship's {@link android.graphics.drawable.Drawable explosion} to the new {@link
 	 * android.graphics.drawable.Drawable explosion} and updates its size and image to be in
 	 * accordance to the new stage.
 	 *
@@ -543,20 +557,6 @@ public class Spaceship {
 	public void setExplosion (Drawable explosion, int stage) {
 		setExplosion(explosion);
 		setExplosion(stage);
-		this.exploding = true;
-	}
-	
-	/**
-	 * Sets the spaceship's {@link android.graphics.drawable.Drawable explosion} to the new {@link
-	 * android.graphics.drawable.Drawable explosion}.
-	 *
-	 * @param explosion the new {@link android.graphics.drawable.Drawable explosion}.
-	 *
-	 * @see com.example.spaceship.classes.Spaceship#explosion
-	 */
-	
-	public void setExplosion (Drawable explosion) {
-		this.explosion = explosion;
 		this.exploding = true;
 	}
 	
