@@ -46,10 +46,7 @@ import static com.example.spaceship.classes.EnemySpaceship.EnemyType;
 
 public class GameView extends View {
 	
-	//TODO: Reorganize everything
-	
 	TextView pointsText;
-	// TODO: Points
 	private int points = 0;
 	private PlayerSpaceship player;
 	private Drawable laser;
@@ -68,7 +65,6 @@ public class GameView extends View {
 	private LinearLayout infoLayout;
 	private Paint hbStroke;
 	private Paint hbFill;
-	//TODO: User & Database
 	private User user;
 	private Random random = new Random();
 	
@@ -432,6 +428,8 @@ public class GameView extends View {
 	 * @throws AssertionError an error thrown if the amount is smaller than 1 or bigger than 6.
 	 */
 	
+	// FIXME: 15/03/2020 generating two enemies (probably i = 3 & i = 4) in the same spot when
+	//  pattern = 1
 	private void generateEnemies (int amount) throws AssertionError {
 		if (amount > 6 || amount < 1)
 			throw new AssertionError("amount is invalid");

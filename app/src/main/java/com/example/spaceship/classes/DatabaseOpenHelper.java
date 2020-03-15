@@ -103,9 +103,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	                                                      SPACESHIPS_COLUMN_TYPE +
 	                                                      " INTEGER);";
 	
-	SQLiteDatabase database;
-	
-	// TODO: Test-Runs & Make sure no USERS_ in Weapon/Spaceship methods
+	private SQLiteDatabase database;
 	
 	/**
 	 * Database constructor

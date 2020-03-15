@@ -92,7 +92,6 @@ public class User {
 	 * @see com.example.spaceship.classes.User#image
 	 */
 	
-	// TODO: String/Blob/Bitmap parameter
 	public User (long id, Bitmap image, String name, int points, int highscore) {
 		this.id        = id;
 		this.name      = name;
