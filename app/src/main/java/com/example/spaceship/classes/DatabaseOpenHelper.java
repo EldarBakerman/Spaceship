@@ -5,12 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import androidx.annotation.Nullable;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,13 +27,10 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	// Users
 	private static final String USERS_COLUMN_ID = "id";
 	private static final String USERS_COLUMN_NAME = "name";
-	private static final String USERS_COLUMN_IMAGE = "image";
 	private static final String USERS_COLUMN_POINTS = "points";
 	private static final String USERS_COLUMN_HIGHSCORE = "highscore";
 	private static final String[] USERS_COLUMNS = {
-			USERS_COLUMN_ID, USERS_COLUMN_NAME, USERS_COLUMN_IMAGE,
-			USERS_COLUMN_POINTS,
-			USERS_COLUMN_HIGHSCORE
+			USERS_COLUMN_ID, USERS_COLUMN_NAME, USERS_COLUMN_POINTS, USERS_COLUMN_HIGHSCORE
 	};
 	
 	// Weapons
@@ -71,8 +65,6 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	                                                 " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 	                                                 USERS_COLUMN_NAME +
 	                                                 " TEXT, " +
-	                                                 USERS_COLUMN_IMAGE +
-	                                                 " BLOB, " +
 	                                                 USERS_COLUMN_POINTS +
 	                                                 " INTEGER, " +
 	                                                 USERS_COLUMN_HIGHSCORE +
@@ -245,50 +237,13 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		long userId = cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_ID));
 		String userName =
 				cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_NAME));
-		Bitmap userImage = getImageFromString(userId);
 		int userPoints =
 				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_POINTS));
 		int userHighscore =
 				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_HIGHSCORE));
 		
 		cursor.close();
-		return new User(userId, userImage, userName, userPoints, userHighscore);
-	}
-	
-	/**
-	 * Converts the {@link java.lang.String string} value stored in the {@link
-	 * android.database.sqlite.SQLiteDatabase database} into a {@link android.graphics.Bitmap
-	 * bitmap} value.
-	 *
-	 * @param id the ID of the User who's image is to be converted.
-	 *
-	 * @return a {@link android.graphics.Bitmap bitmap} value that is the result of the String
-	 * 		value in the database.
-	 */
-	
-	private Bitmap getImageFromString (long id) {
-		
-		Cursor cursor = database.rawQuery("SELECT " +
-		                                  USERS_COLUMN_IMAGE +
-		                                  " FROM " +
-		                                  TABLE_USERS +
-		                                  " WHERE " +
-		                                  USERS_COLUMN_ID +
-		                                  " = " +
-		                                  id, null);
-		
-		if (cursor.moveToFirst()) {
-			byte[] imgByte =
-					cursor.getBlob(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_IMAGE));
-			cursor.close();
-			if (imgByte != null)
-				return BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
-		}
-		
-		if (!cursor.isClosed())
-			cursor.close();
-		
-		return null;
+		return new User(userId, userName, userPoints, userHighscore);
 	}
 	
 	/**
@@ -451,17 +406,11 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 					cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_ID));
 			String userName =
 					cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_NAME));
-			byte[] userImage =
-					cursor.getBlob(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_IMAGE));
 			int userPoints =
 					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_POINTS));
 			int userHighscore =
 					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_HIGHSCORE));
-			users.add(new User(userId,
-			                   BitmapFactory.decodeByteArray(userImage, 0, userImage.length),
-			                   userName,
-			                   userPoints,
-			                   userHighscore));
+			users.add(new User(userId, userName, userPoints, userHighscore));
 		}
 		
 		cursor.close();
@@ -663,7 +612,6 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put(DatabaseOpenHelper.USERS_COLUMN_ID, user.getId());
 		values.put(DatabaseOpenHelper.USERS_COLUMN_NAME, user.getName());
-		values.put(DatabaseOpenHelper.USERS_COLUMN_IMAGE, getStringFromImage(user.getImage()));
 		values.put(DatabaseOpenHelper.USERS_COLUMN_POINTS, user.getPoints());
 		values.put(DatabaseOpenHelper.USERS_COLUMN_HIGHSCORE, user.getHighscore());
 		
@@ -671,23 +619,6 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		                       values,
 		                       DatabaseOpenHelper.USERS_COLUMN_ID + " = " + user.getId(),
 		                       null);
-	}
-	
-	/**
-	 * Converts the {@link android.graphics.Bitmap image} field of the {@link
-	 * com.example.spaceship.classes.User user} into a {@link java.lang.String string} value that
-	 * can be stored in the {@link android.database.sqlite.SQLiteDatabase database}.
-	 *
-	 * @param image the image to store in the {@link android.database.sqlite.SQLiteDatabase
-	 *              Database}.
-	 *
-	 * @return the String value of the {@link android.graphics.Bitmap image}.
-	 */
-	
-	private byte[] getStringFromImage (Bitmap image) {
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		image.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-		return outputStream.toByteArray();
 	}
 	
 	/**

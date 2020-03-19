@@ -4,7 +4,13 @@
           package="com.example.spaceship">
 	
 	<dist:module dist:instant="true" />
-	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission
+		android:name="android.permission.CAMERA"
+		android:required="true" />
+	
+	<uses-feature
+		android:name="android.hardware.camera"
+		android:required="true" />
 	
 	<application
 		android:allowBackup="false"
