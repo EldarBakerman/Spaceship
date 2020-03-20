@@ -27,8 +27,9 @@ public class SplashActivity extends AppCompatActivity {
 		database = new DatabaseOpenHelper(this);
 		SharedPreferences sharedPreferences = getSharedPreferences("Splash", MODE_PRIVATE);
 		
-		for (Weapon weapon : Weapon.weapons)
-			database.insert(weapon);
+		if (database.getAllWeapons() == null || database.getAllWeapons().isEmpty())
+			for (Weapon weapon : Weapon.weapons)
+				database.insert(weapon);
 		
 		long userId;
 		
@@ -68,10 +69,10 @@ public class SplashActivity extends AppCompatActivity {
 				return;
 			}
 			
-			long id = database.insert(user).getId();
-			getSharedPreferences("Splash", MODE_PRIVATE).edit().putLong("userId", id).apply();
+			long userId = database.insert(user).getId();
+			getSharedPreferences("Splash", MODE_PRIVATE).edit().putLong("userId", userId).apply();
 			Intent intent = new Intent(SplashActivity.this, MenuActivity.class);
-			intent.putExtra("userId", id);
+			intent.putExtra("userId", userId);
 			startActivity(intent);
 			finish();
 		});

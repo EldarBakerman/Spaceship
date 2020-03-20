@@ -1,6 +1,8 @@
 package com.example.spaceship.classes;
 
+import android.database.SQLException;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,14 +25,20 @@ public class Weapon {
 	public static List<Weapon> weapons = new ArrayList<>();
 	
 	static {
-		// TODO: Get equipped weapon from Database
-		WEAPON_0 = new Weapon("Default", 5, 2, 0);
-		WEAPON_0.setOwned(true);
-		WEAPON_0.setEquipped(true);
-		PlayerSpaceship.setEquippedWeapon(WEAPON_0);
-		WEAPON_1 = new Weapon("Death Ray", 10, 3, 25);
-		WEAPON_2 = new Weapon("Finisher", 20, 1, 50);
-		WEAPON_3 = new Weapon("Purified Light", 30, 2, 100);
+		final List<Weapon> allWeapons = SplashActivity.database.getAllWeapons();
+		if (allWeapons == null || allWeapons.isEmpty()) {
+			WEAPON_0          = new Weapon("Default", 5, 2, 0);
+			WEAPON_0.owned    = true;
+			WEAPON_0.equipped = true;
+			WEAPON_1          = new Weapon("Death Ray", 8, 3, 25);
+			WEAPON_2          = new Weapon("Finisher", 12, 1, 50);
+			WEAPON_3          = new Weapon("Purified Light", 15, 2, 100);
+		} else {
+			WEAPON_0 = new Weapon(allWeapons.get(0));
+			WEAPON_1 = new Weapon(allWeapons.get(1));
+			WEAPON_2 = new Weapon(allWeapons.get(2));
+			WEAPON_3 = new Weapon(allWeapons.get(3));
+		}
 	}
 	
 	/**
@@ -83,6 +91,9 @@ public class Weapon {
 	
 	/**
 	 * A constructor of the weapon that is usually used by the Database.
+	 * Adds {@link com.example.spaceship.classes.Weapon weapon} to the {@link
+	 * com.example.spaceship.classes.Weapon#weapons} list and to the {@link
+	 * com.example.spaceship.classes.DatabaseOpenHelper database}.
 	 *
 	 * @param id       the ID of the weapon in the Database.
 	 * @param name     the name of the weapon.
@@ -99,6 +110,8 @@ public class Weapon {
 	 * @see com.example.spaceship.classes.Weapon#price
 	 * @see com.example.spaceship.classes.Weapon#owned
 	 * @see com.example.spaceship.classes.Weapon#equipped
+	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see com.example.spaceship.activities.SplashActivity#database
 	 */
 	
 	public Weapon (long id, String name, int damage, int speed, int price, boolean owned,
@@ -146,6 +159,9 @@ public class Weapon {
 	
 	/**
 	 * A constructor of the weapon that takes only the most basic arguments and the image.
+	 * Adds {@link com.example.spaceship.classes.Weapon weapon} to the {@link
+	 * com.example.spaceship.classes.Weapon#weapons} list and to the {@link
+	 * com.example.spaceship.classes.DatabaseOpenHelper database}.
 	 *
 	 * @param name   the name of the weapon.
 	 * @param damage the damage of the weapon.
@@ -158,6 +174,8 @@ public class Weapon {
 	 * @see com.example.spaceship.classes.Weapon#speed
 	 * @see com.example.spaceship.classes.Weapon#price
 	 * @see com.example.spaceship.classes.Weapon#image
+	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see com.example.spaceship.activities.SplashActivity#database
 	 */
 	
 	public Weapon (String name, int damage, int speed, Drawable image, int price) {
@@ -175,49 +193,45 @@ public class Weapon {
 	}
 	
 	/**
-	 * Get's the weapon's image.
+	 * Copy constructor that copies all the fields from the other {@link
+	 * com.example.spaceship.classes.Weapon weapon}.
+	 * <p>
+	 * Removes previous {@link com.example.spaceship.classes.Weapon weapon} from {@link
+	 * com.example.spaceship.classes.DatabaseOpenHelper database} and adds the new one (if doesn't
+	 * already exist).
 	 *
-	 * @return the weapon's image.
+	 * @param weapon the other weapon to copy from.
 	 *
+	 * @see com.example.spaceship.classes.Weapon
+	 * @see com.example.spaceship.classes.Weapon#id
+	 * @see com.example.spaceship.classes.Weapon#name
+	 * @see com.example.spaceship.classes.Weapon#damage
+	 * @see com.example.spaceship.classes.Weapon#speed
+	 * @see com.example.spaceship.classes.Weapon#price
 	 * @see com.example.spaceship.classes.Weapon#image
+	 * @see com.example.spaceship.classes.Weapon#owned
+	 * @see com.example.spaceship.classes.Weapon#equipped
+	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see com.example.spaceship.activities.SplashActivity#database
 	 */
 	
-	public Drawable getImage () {
-		return image;
-	}
-	
-	/**
-	 * Sets the weapon's image to the new image.
-	 *
-	 * @param image the new image.
-	 *
-	 * @see com.example.spaceship.classes.Weapon#image
-	 */
-	
-	public void setImage (Drawable image) {
-		this.image = image;
-		SplashActivity.database.update(this);
-	}
-	
-	/**
-	 * An equals method overriding the {@link Object#equals(Object)} method located at {@link
-	 * java.lang.Object}.
-	 *
-	 * @param obj the {@link java.lang.Object object } to compare to.
-	 *
-	 * @return true if all the fields are equal.
-	 */
-	
-	@Override
-	public boolean equals (@Nullable Object obj) {
-		return obj instanceof Weapon &&
-		       ((Weapon) obj).getId() == this.id &&
-		       ((Weapon) obj).getName().equals(this.name) &&
-		       ((Weapon) obj).getPrice() == this.price &&
-		       ((Weapon) obj).getDamage() == this.damage &&
-		       ((Weapon) obj).getSpeed() == this.speed &&
-		       ((Weapon) obj).isOwned() == this.owned &&
-		       ((Weapon) obj).isEquipped() == this.equipped;
+	public Weapon (Weapon weapon) {
+		SplashActivity.database.deleteWeapon(this.id);
+		this.id       = weapon.getId();
+		this.name     = weapon.getName();
+		this.damage   = weapon.getDamage();
+		this.speed    = weapon.getSpeed();
+		this.price    = weapon.getPrice();
+		this.image    = weapon.getImage();
+		this.owned    = weapon.isOwned();
+		this.equipped = weapon.isEquipped();
+		
+		try {
+			SplashActivity.database.getWeapon(this.id);
+		} catch (SQLException exception) {
+			Log.d("Weapon#copyConstructor", "Cannot find ID " + this.id + " in Database.");
+			SplashActivity.database.insert(this);
+		}
 	}
 	
 	/**
@@ -242,31 +256,6 @@ public class Weapon {
 	
 	public String getName () {
 		return name;
-	}
-	
-	/**
-	 * Returns the weapon's price.
-	 *
-	 * @return the weapon's price.
-	 *
-	 * @see com.example.spaceship.classes.Weapon#price
-	 */
-	
-	public int getPrice () {
-		return price;
-	}
-	
-	/**
-	 * Sets the weapon's price to the new price.
-	 *
-	 * @param price the new price.
-	 *
-	 * @see com.example.spaceship.classes.Weapon#price
-	 */
-	
-	public void setPrice (int price) {
-		this.price = price;
-		SplashActivity.database.update(this);
 	}
 	
 	/**
@@ -307,15 +296,39 @@ public class Weapon {
 	}
 	
 	/**
-	 * Sets the weapon's speed to the new speed.
+	 * Returns the weapon's price.
 	 *
-	 * @param speed the new speed.
+	 * @return the weapon's price.
 	 *
-	 * @see com.example.spaceship.classes.Weapon#speed
+	 * @see com.example.spaceship.classes.Weapon#price
 	 */
 	
-	public void setSpeed (int speed) {
-		this.speed = speed;
+	public int getPrice () {
+		return price;
+	}
+	
+	/**
+	 * Get's the weapon's image.
+	 *
+	 * @return the weapon's image.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#image
+	 */
+	
+	public Drawable getImage () {
+		return image;
+	}
+	
+	/**
+	 * Sets the weapon's image to the new image.
+	 *
+	 * @param image the new image.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#image
+	 */
+	
+	public void setImage (Drawable image) {
+		this.image = image;
 		SplashActivity.database.update(this);
 	}
 	
@@ -379,6 +392,32 @@ public class Weapon {
 	}
 	
 	/**
+	 * Sets the weapon's price to the new price.
+	 *
+	 * @param price the new price.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#price
+	 */
+	
+	public void setPrice (int price) {
+		this.price = price;
+		SplashActivity.database.update(this);
+	}
+	
+	/**
+	 * Sets the weapon's speed to the new speed.
+	 *
+	 * @param speed the new speed.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#speed
+	 */
+	
+	public void setSpeed (int speed) {
+		this.speed = speed;
+		SplashActivity.database.update(this);
+	}
+	
+	/**
 	 * Sets the weapon's name to the new name.
 	 *
 	 * @param name the new name.
@@ -402,6 +441,27 @@ public class Weapon {
 	public void setId (long id) {
 		this.id = id;
 		SplashActivity.database.update(this);
+	}
+	
+	/**
+	 * An equals method overriding the {@link Object#equals(Object)} method located at {@link
+	 * java.lang.Object}.
+	 *
+	 * @param obj the {@link java.lang.Object object } to compare to.
+	 *
+	 * @return true if all the fields are equal.
+	 */
+	
+	@Override
+	public boolean equals (@Nullable Object obj) {
+		return obj instanceof Weapon &&
+		       ((Weapon) obj).getId() == this.id &&
+		       ((Weapon) obj).getName().equals(this.name) &&
+		       ((Weapon) obj).getPrice() == this.price &&
+		       ((Weapon) obj).getDamage() == this.damage &&
+		       ((Weapon) obj).getSpeed() == this.speed &&
+		       ((Weapon) obj).isOwned() == this.owned &&
+		       ((Weapon) obj).isEquipped() == this.equipped;
 	}
 	
 	/**

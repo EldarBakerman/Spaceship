@@ -40,33 +40,242 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.example.spaceship.classes.EnemySpaceship.EnemyType;
 
 /**
- * Game's Custom View to be shown at {@link com.example.spaceship.activities.GameActivity
- * GameActivity}
+ * {@link com.example.spaceship.activities.GameActivity GameActivity}'s custom {@link
+ * android.view.View view}.
+ * Contains all the logic and graphics of the game.
+ *
+ * @see com.example.spaceship.activities.GameActivity
+ * @see android.view.View
  */
 
 public class GameView extends View {
 	
+	/**
+	 * The amount of points a spaceship awards.
+	 *
+	 * @see com.example.spaceship.views.GameView#points
+	 */
+	
+	private static final int SPACESHIP_POINTS = 1;
+	
+	/**
+	 * The points' {@link android.widget.TextView TextView}.
+	 *
+	 * @see com.example.spaceship.views.GameView#points
+	 */
+	
 	TextView pointsText;
-	private int points = 0;
+	
+	/**
+	 * A field storing the current amount of points in-game.
+	 */
+	
+	private int points;
+	
+	/**
+	 * The {@link com.example.spaceship.classes.PlayerSpaceship player}'s spaceship.
+	 *
+	 * @see com.example.spaceship.classes.PlayerSpaceship
+	 */
+	
 	private PlayerSpaceship player;
+	
+	/**
+	 * The {@link android.graphics.drawable.Drawable drawable} representing the {@link
+	 * com.example.spaceship.views.GameView#player}'s weapon visually.
+	 *
+	 * @see com.example.spaceship.views.GameView#player
+	 * @see com.example.spaceship.classes.Weapon
+	 */
+	
 	private Drawable laser;
+	
+	/**
+	 * The timer's {@link android.widget.TextView TextView}.
+	 *
+	 * @see java.util.Timer
+	 */
+	
 	private TextView timerText;
+	
+	/**
+	 * The {@link android.graphics.drawable.Drawable drawable} representing the {@link
+	 * com.example.spaceship.views.GameView#player}'s
+	 * {@link com.example.spaceship.classes.Spaceship
+	 * spaceship} visually.
+	 *
+	 * @see com.example.spaceship.classes.PlayerSpaceship
+	 * @see com.example.spaceship.classes.Spaceship
+	 */
+	
 	private Drawable dPlayer;
-	// Boolean Checkers
-	private AtomicBoolean start = new AtomicBoolean(true);
-	private boolean timerTick = false;
-	private boolean tapped = false;
-	private boolean laserAnimating = false;
-	private boolean miss = false;
-	private boolean lost = false;
-	private boolean win = false;
+	
+	/**
+	 * An array of {@link com.example.spaceship.classes.EnemySpaceship enemies} that holds all the
+	 * enemies in the current level.
+	 *
+	 * @see com.example.spaceship.classes.EnemySpaceship
+	 */
+	
 	private EnemySpaceship[] enemies;
+	
+	
+	/**
+	 * An {@link com.example.spaceship.classes.EnemySpaceship EnemySpaceship} reference to the
+	 * current target of the laser. Null if no target.
+	 *
+	 * @see GameView#laserTarget()
+	 * @see com.example.spaceship.views.GameView#miss
+	 */
+	
 	private EnemySpaceship hit = null;
+	
+	/**
+	 * The {@link android.widget.LinearLayout layout} for the
+	 * {@link com.example.spaceship.views.GameView#timerText}
+	 * and {@link com.example.spaceship.views.GameView#pointsText}.
+	 *
+	 * @see com.example.spaceship.views.GameView#timerText
+	 * @see com.example.spaceship.views.GameView#pointsText
+	 * @see android.widget.LinearLayout
+	 */
+	
 	private LinearLayout infoLayout;
+	
+	/**
+	 * The {@link android.graphics.Paint paint} for the stroke of the {@link android.graphics.RectF
+	 * healthbar} of
+	 * the {@link com.example.spaceship.classes.Spaceship spaceships}.
+	 *
+	 * @see com.example.spaceship.views.GameView#player
+	 * @see com.example.spaceship.views.GameView#enemies
+	 * @see com.example.spaceship.classes.Spaceship
+	 * @see com.example.spaceship.classes.PlayerSpaceship
+	 * @see com.example.spaceship.classes.EnemySpaceship
+	 * @see com.example.spaceship.views.GameView#initHealthbar(android.graphics.Canvas,
+	 *        com.example.spaceship.classes.Spaceship)
+	 */
+	
 	private Paint hbStroke;
+	
+	/**
+	 * The {@link android.graphics.Paint paint} for the fill of the {@link android.graphics.RectF
+	 * healthbar} of
+	 * the {@link com.example.spaceship.classes.Spaceship spaceships}.
+	 *
+	 * @see com.example.spaceship.views.GameView#player
+	 * @see com.example.spaceship.views.GameView#enemies
+	 * @see com.example.spaceship.classes.Spaceship
+	 * @see com.example.spaceship.classes.PlayerSpaceship
+	 * @see com.example.spaceship.classes.EnemySpaceship
+	 * @see com.example.spaceship.views.GameView#initHealthbar(android.graphics.Canvas,
+	 *        com.example.spaceship.classes.Spaceship)
+	 */
+	
 	private Paint hbFill;
+	
+	/**
+	 * The current {@link com.example.spaceship.classes.User user}.
+	 * Initialized and updated by the {@link com.example.spaceship.classes.DatabaseOpenHelper
+	 * database}.
+	 *
+	 * @see com.example.spaceship.classes.User
+	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see com.example.spaceship.activities.SplashActivity#database
+	 */
+	
 	private User user;
+	
+	/**
+	 * A {@link java.util.Random random} object that is used in order to generate random values in
+	 * methods that require random values.
+	 *
+	 * @see java.util.Random
+	 * @see com.example.spaceship.views.GameView#generateEnemies(int)
+	 */
+	
 	private Random random = new Random();
+	
+	// Boolean Checkers
+	
+	/**
+	 * A boolean value that indicates whether the canvas has been initialized for the first time or
+	 * not.
+	 *
+	 * @see java.util.concurrent.atomic.AtomicBoolean
+	 * @see com.example.spaceship.views.GameView#onDraw(android.graphics.Canvas)
+	 * @see android.graphics.Canvas
+	 */
+	
+	private AtomicBoolean start = new AtomicBoolean(true);
+	
+	/**
+	 * A boolean value that indicates whether the current call to {@link
+	 * com.example.spaceship.views.GameView#onDraw(android.graphics.Canvas)} is by the {@link
+	 * java.util.Timer timer} or not.
+	 *
+	 * @see com.example.spaceship.views.GameView#onDraw(android.graphics.Canvas)
+	 * @see java.util.Timer
+	 */
+	
+	private boolean timerTick = false;
+	
+	/**
+	 * A boolean value that indicates whether the current call to {@link
+	 * com.example.spaceship.views.GameView#onDraw(android.graphics.Canvas)} is by the {@link
+	 * com.example.spaceship.views.GameView#onTouchEvent(android.view.MotionEvent)} or not.
+	 *
+	 * @see com.example.spaceship.views.GameView#onDraw(android.graphics.Canvas)
+	 * @see com.example.spaceship.views.GameView#onTouchEvent(android.view.MotionEvent)
+	 */
+	
+	private boolean tapped = false;
+	
+	/**
+	 * A boolean value that indicates whether the laser is currently mid-animation or not.
+	 *
+	 * @see com.example.spaceship.views.GameView#laser
+	 * @see GameView#animateLaser()
+	 */
+	
+	private boolean laserAnimating = false;
+	
+	/**
+	 * A boolean value that indicates whether the
+	 * {@link com.example.spaceship.views.GameView#laser}
+	 * has missed its shot
+	 * or not.
+	 *
+	 * @see com.example.spaceship.views.GameView#laser
+	 * @see GameView#laserTarget()
+	 */
+	
+	private boolean miss = false;
+	
+	/**
+	 * A boolean value that indicates whether the game is lost or not.
+	 * Performs its check by checking whether the
+	 * {@link com.example.spaceship.views.GameView#player}'s
+	 * HP is below 0.
+	 *
+	 * @see com.example.spaceship.views.GameView#player
+	 * @see com.example.spaceship.classes.Spaceship#getHp()
+	 */
+	
+	private boolean lost = false;
+	
+	/**
+	 * A boolean value that indicates whether the game is won or not.
+	 * Performs its check by checking whether all the
+	 * {@link com.example.spaceship.classes.EnemySpaceship
+	 * enemies} are exploded.
+	 *
+	 * @see com.example.spaceship.views.GameView#enemies
+	 * @see com.example.spaceship.classes.EnemySpaceship
+	 * @see com.example.spaceship.views.GameView#explode(com.example.spaceship.classes.Spaceship)
+	 */
+	
+	private boolean win = false;
 	
 	
 	/**
@@ -85,7 +294,7 @@ public class GameView extends View {
 		// User
 		
 		user   = SplashActivity.database.getUser(activity.getIntent().getLongExtra("userId", -1));
-		points = activity.getIntent().getIntExtra("points", 0);
+		points = user.getPoints();
 		
 		
 		// Player
@@ -217,8 +426,7 @@ public class GameView extends View {
 		}, 0, 300);
 		
 		if (spaceship instanceof EnemySpaceship) {
-			user.setPoints(user.getPoints() + 5);
-			points += 5;
+			points += SPACESHIP_POINTS;
 			pointsText.setText(String.format(Locale.ENGLISH,
 			                                 "%s%d",
 			                                 getResources().getString(R.string.points),
@@ -303,13 +511,12 @@ public class GameView extends View {
 		
 		// Animation
 		if (start.get()) {
-			start.getAndSet(false);
 			setBackgroundColor(Color.BLACK);
-			dPlayer.setBounds(getWidth() / 2 - 150,
-			                  getHeight() - 300,
+			dPlayer.setBounds(getWidth() / 2 - 150, getHeight() - 300,
 			                  getWidth() / 2 + 150,
 			                  getHeight() - 100);
 			generateEnemies(random.nextInt(6) + 1);
+			start.getAndSet(false);
 		}
 		
 		for (EnemySpaceship enemy : enemies) {
@@ -402,12 +609,11 @@ public class GameView extends View {
 	 */
 	
 	private void launchGame () {
-		Activity activity = ((Activity) getContext());
+		Activity activity = (Activity) getContext();
 		Intent intent = new Intent(activity, GameActivity.class);
 		
-		if (win)
-			intent.putExtra("points", user.getPoints());
-		
+		user.setPoints(points);
+		SplashActivity.database.update(user);
 		intent.putExtra("userId", user.getId());
 		
 		activity.startActivity(intent);
@@ -426,18 +632,18 @@ public class GameView extends View {
 	 * @param amount the amount of spaceships to generate
 	 *
 	 * @throws AssertionError an error thrown if the amount is smaller than 1 or bigger than 6.
+	 * @throws AssertionError an error thrown if the method is called after the first time the
+	 *                        canvas is initialized.
 	 */
 	
-	// FIXME: 15/03/2020 generating two enemies (probably i = 3 & i = 4) in the same spot when
-	//  pattern = 1
-	private void generateEnemies (int amount) throws AssertionError {
+	private synchronized void generateEnemies (int amount) throws AssertionError {
 		if (amount > 6 || amount < 1)
 			throw new AssertionError("amount is invalid");
 		
 		// If method was called from constructor - exit (can't set coordinates if canvas
 		// hasn't loaded yet)
-		if (start.get())
-			throw new AssertionError("must be called only after canvas was initialized");
+		if (!start.get())
+			throw new AssertionError("must be called only on start");
 		
 		enemies = new EnemySpaceship[amount];
 		
@@ -578,6 +784,7 @@ public class GameView extends View {
 						                PREV_BOTTOM_MARGIN,
 						                RIGHT_MARGIN,
 						                PREV_BOTTOM_MARGIN + HEIGHT);
+						break;
 					case 4:
 						if (amount == 5)
 							image.setBounds(RIGHT_MARGIN_EDGE - WIDTH,
