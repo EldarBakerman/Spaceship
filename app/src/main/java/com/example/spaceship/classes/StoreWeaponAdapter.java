@@ -25,13 +25,11 @@ public class StoreWeaponAdapter extends ArrayAdapter<Weapon> {
 	
 	private final Activity context;
 	private final List<Weapon> weapons;
-	public View[] views;
 	
 	public StoreWeaponAdapter (@NonNull Activity context, List<Weapon> weapons) {
 		super(context, R.layout.weapons, weapons);
 		this.context = context;
 		this.weapons = weapons;
-		this.views   = new View[this.weapons.size()];
 	}
 	
 	@NonNull
@@ -41,8 +39,6 @@ public class StoreWeaponAdapter extends ArrayAdapter<Weapon> {
 			LayoutInflater inflater = context.getLayoutInflater();
 			convertView = inflater.inflate(R.layout.weapons, parent, false);
 		}
-		
-		views[position] = convertView;
 		
 		ImageView image = convertView.findViewById(R.id.image);
 		TextView nameText = convertView.findViewById(R.id.name);
