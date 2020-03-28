@@ -1,6 +1,5 @@
 package com.example.spaceship.classes;
 
-import android.database.SQLException;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
@@ -30,9 +29,9 @@ public class Weapon {
 			WEAPON_0          = new Weapon("Default", 5, 2, 0);
 			WEAPON_0.owned    = true;
 			WEAPON_0.equipped = true;
-			WEAPON_1          = new Weapon("Death Ray", 8, 3, 25);
+			WEAPON_1          = new Weapon("Prism", 8, 3, 25);
 			WEAPON_2          = new Weapon("Finisher", 12, 1, 50);
-			WEAPON_3          = new Weapon("Purified Light", 15, 2, 100);
+			WEAPON_3          = new Weapon("Purity", 15, 2, 100);
 		} else {
 			WEAPON_0 = new Weapon(allWeapons.get(0));
 			WEAPON_1 = new Weapon(allWeapons.get(1));
@@ -55,12 +54,22 @@ public class Weapon {
 	
 	/**
 	 * The amount of HP the weapon reduces from the target after it hits.
+	 * <p>
+	 * Min. Value: 5
+	 * Max. Value: 20
+	 * Def. Value: 5
+	 * </p>
 	 */
 	
 	private int damage;
 	
 	/**
-	 * The velocity in which the laser is moving.
+	 * The velocity multiplier that determines in which speed the laser moves.
+	 * <p>
+	 * Min. Value: 1
+	 * Max. Value: 3
+	 * Def. Value: 2
+	 * </p>
 	 */
 	
 	private int speed;
@@ -116,6 +125,15 @@ public class Weapon {
 	
 	public Weapon (long id, String name, int damage, int speed, int price, boolean owned,
 	               boolean equipped) {
+		log(id, name, damage, speed, price, owned, equipped);
+		
+		try {
+			SplashActivity.database.deleteWeapon(this.id);
+		} catch (Exception e) {
+			Log.d("Weapon#constructor",
+			      String.format("Failed to delete Weapon %s with ID %d", this.name, this.id));
+		}
+		
 		this.id       = id;
 		this.name     = name;
 		this.damage   = damage;
@@ -123,11 +141,28 @@ public class Weapon {
 		this.price    = price;
 		this.owned    = owned;
 		this.equipped = equipped && owned;
-		weapons.add(this);
-		if (SplashActivity.database != null &&
-		    SplashActivity.database.getAllWeapons() != null &&
-		    SplashActivity.database.getAllWeapons().size() > 0)
+		
+		int i;
+		for (i = 0; i < weapons.size(); i++) {
+			if ((this.id >= 1 && this.id == weapons.get(i).id) || (this.id < 1 && this.name.equals(
+					weapons.get(i).name))) {
+				weapons.remove(weapons.get(i));
+				weapons.add(i, this);
+			}
+		}
+		
+		if (i == weapons.size())
+			weapons.add(this);
+		
+		try {
+			SplashActivity.database.getWeapon(this.name);
 			SplashActivity.database.update(this);
+		} catch (NullPointerException exception) {
+			exception.printStackTrace();
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			SplashActivity.database.insert(this);
+		}
 	}
 	
 	/**
@@ -145,16 +180,34 @@ public class Weapon {
 	 */
 	
 	public Weapon (String name, int damage, int speed, int price) {
+		log(name, damage, speed, price);
+		
+		try {
+			SplashActivity.database.deleteWeapon(this.id);
+		} catch (Exception e) {
+			Log.d("Weapon#constructor", "Cannot find weapon with ID " + this.id);
+		}
+		
 		this.id     = -1;
 		this.name   = name;
 		this.damage = damage;
 		this.speed  = speed;
 		this.price  = price;
-		weapons.add(this);
-		if (SplashActivity.database != null &&
-		    SplashActivity.database.getAllWeapons() != null &&
-		    SplashActivity.database.getAllWeapons().size() > 0)
-			SplashActivity.database.update(this);
+		
+		int i;
+		for (i = 0; i < weapons.size(); i++) {
+			if ((this.id >= 1 && this.id == weapons.get(i).id) || (this.id < 1 && this.name.equals(
+					weapons.get(i).name))) {
+				weapons.remove(weapons.get(i));
+				weapons.add(i, this);
+			}
+		}
+		
+		if (i == weapons.size())
+			weapons.add(this);
+		
+		if (SplashActivity.database != null)
+			this.id = SplashActivity.database.insert(this).id;
 	}
 	
 	/**
@@ -179,17 +232,42 @@ public class Weapon {
 	 */
 	
 	public Weapon (String name, int damage, int speed, Drawable image, int price) {
+		log(name, damage, speed, price);
+		
+		try {
+			SplashActivity.database.deleteWeapon(this.id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		this.id     = -1;
 		this.name   = name;
 		this.damage = damage;
 		this.speed  = speed;
 		this.image  = image;
 		this.price  = price;
-		weapons.add(this);
-		if (SplashActivity.database != null &&
-		    SplashActivity.database.getAllWeapons() != null &&
-		    SplashActivity.database.getAllWeapons().size() > 0)
+		
+		int i;
+		for (i = 0; i < weapons.size(); i++) {
+			if ((this.id >= 1 && this.id == weapons.get(i).id) || (this.id < 1 && this.name.equals(
+					weapons.get(i).name))) {
+				weapons.remove(weapons.get(i));
+				weapons.add(i, this);
+			}
+		}
+		
+		if (i == weapons.size())
+			weapons.add(this);
+		
+		try {
+			SplashActivity.database.getWeapon(this.name);
 			SplashActivity.database.update(this);
+		} catch (NullPointerException exception) {
+			exception.printStackTrace();
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			SplashActivity.database.insert(this);
+		}
 	}
 	
 	/**
@@ -216,7 +294,14 @@ public class Weapon {
 	 */
 	
 	public Weapon (Weapon weapon) {
-		SplashActivity.database.deleteWeapon(this.id);
+		log(weapon);
+		
+		try {
+			SplashActivity.database.deleteWeapon(this.id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		this.id       = weapon.getId();
 		this.name     = weapon.getName();
 		this.damage   = weapon.getDamage();
@@ -226,10 +311,25 @@ public class Weapon {
 		this.owned    = weapon.isOwned();
 		this.equipped = weapon.isEquipped();
 		
+		int i;
+		for (i = 0; i < weapons.size(); i++) {
+			if ((this.id >= 1 && this.id == weapons.get(i).id) || (this.id < 1 && this.name.equals(
+					weapons.get(i).name))) {
+				weapons.remove(weapons.get(i));
+				weapons.add(i, this);
+			}
+		}
+		
+		if (i == weapons.size())
+			weapons.add(this);
+		
 		try {
-			SplashActivity.database.getWeapon(this.id);
-		} catch (SQLException exception) {
-			Log.d("Weapon#copyConstructor", "Cannot find ID " + this.id + " in Database.");
+			SplashActivity.database.getWeapon(this.name);
+			SplashActivity.database.update(this);
+		} catch (NullPointerException exception) {
+			exception.printStackTrace();
+		} catch (Exception exception) {
+			exception.printStackTrace();
 			SplashActivity.database.insert(this);
 		}
 	}
@@ -247,6 +347,19 @@ public class Weapon {
 	}
 	
 	/**
+	 * Sets the weapon's id to the new id.
+	 *
+	 * @param id the new id.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#id
+	 */
+	
+	public void setId (long id) {
+		this.id = id;
+		SplashActivity.database.update(this);
+	}
+	
+	/**
 	 * Returns the weapon's name.
 	 *
 	 * @return the weapon's name.
@@ -256,6 +369,19 @@ public class Weapon {
 	
 	public String getName () {
 		return name;
+	}
+	
+	/**
+	 * Sets the weapon's name to the new name.
+	 *
+	 * @param name the new name.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#name
+	 */
+	
+	public void setName (String name) {
+		this.name = name;
+		SplashActivity.database.update(this);
 	}
 	
 	/**
@@ -296,6 +422,19 @@ public class Weapon {
 	}
 	
 	/**
+	 * Sets the weapon's speed to the new speed.
+	 *
+	 * @param speed the new speed.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#speed
+	 */
+	
+	public void setSpeed (int speed) {
+		this.speed = speed;
+		SplashActivity.database.update(this);
+	}
+	
+	/**
 	 * Returns the weapon's price.
 	 *
 	 * @return the weapon's price.
@@ -305,6 +444,19 @@ public class Weapon {
 	
 	public int getPrice () {
 		return price;
+	}
+	
+	/**
+	 * Sets the weapon's price to the new price.
+	 *
+	 * @param price the new price.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#price
+	 */
+	
+	public void setPrice (int price) {
+		this.price = price;
+		SplashActivity.database.update(this);
 	}
 	
 	/**
@@ -345,6 +497,23 @@ public class Weapon {
 	}
 	
 	/**
+	 * Sets the equipped field to the new owned field. If the field is set to false, sets the
+	 * {@link
+	 * com.example.spaceship.classes.Weapon#equipped} field to false.
+	 *
+	 * @param owned the new owned field.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#owned
+	 * @see com.example.spaceship.classes.Weapon#equipped
+	 */
+	
+	public void setOwned (boolean owned) {
+		this.owned    = owned;
+		this.equipped = owned && this.equipped;
+		SplashActivity.database.update(this);
+	}
+	
+	/**
 	 * Returns true if the weapon is equipped.
 	 *
 	 * @return true if the weapon is equipped.
@@ -371,75 +540,6 @@ public class Weapon {
 		if (!owned)
 			throw new AssertionError("can't equip if not owned");
 		this.equipped = equipped;
-		SplashActivity.database.update(this);
-	}
-	
-	/**
-	 * Sets the equipped field to the new owned field. If the field is set to false, sets the
-	 * {@link
-	 * com.example.spaceship.classes.Weapon#equipped} field to false.
-	 *
-	 * @param owned the new owned field.
-	 *
-	 * @see com.example.spaceship.classes.Weapon#owned
-	 * @see com.example.spaceship.classes.Weapon#equipped
-	 */
-	
-	public void setOwned (boolean owned) {
-		this.owned    = owned;
-		this.equipped = owned && this.equipped;
-		SplashActivity.database.update(this);
-	}
-	
-	/**
-	 * Sets the weapon's price to the new price.
-	 *
-	 * @param price the new price.
-	 *
-	 * @see com.example.spaceship.classes.Weapon#price
-	 */
-	
-	public void setPrice (int price) {
-		this.price = price;
-		SplashActivity.database.update(this);
-	}
-	
-	/**
-	 * Sets the weapon's speed to the new speed.
-	 *
-	 * @param speed the new speed.
-	 *
-	 * @see com.example.spaceship.classes.Weapon#speed
-	 */
-	
-	public void setSpeed (int speed) {
-		this.speed = speed;
-		SplashActivity.database.update(this);
-	}
-	
-	/**
-	 * Sets the weapon's name to the new name.
-	 *
-	 * @param name the new name.
-	 *
-	 * @see com.example.spaceship.classes.Weapon#name
-	 */
-	
-	public void setName (String name) {
-		this.name = name;
-		SplashActivity.database.update(this);
-	}
-	
-	/**
-	 * Sets the weapon's id to the new id.
-	 *
-	 * @param id the new id.
-	 *
-	 * @see com.example.spaceship.classes.Weapon#id
-	 */
-	
-	public void setId (long id) {
-		this.id = id;
 		SplashActivity.database.update(this);
 	}
 	
@@ -512,5 +612,115 @@ public class Weapon {
 	
 	public String getSpeedString () {
 		return this.speed + " au/h";
+	}
+	
+	/**
+	 * Logs all the fields of the Weapon and all the parameters.
+	 *
+	 * @param id       the id parameter
+	 * @param name     the name parameter
+	 * @param damage   the damage parameter
+	 * @param speed    the speed parameter
+	 * @param price    the price parameter
+	 * @param owned    the owned parameter
+	 * @param equipped the equipped parameter
+	 *
+	 * @see com.example.spaceship.classes.Weapon#id
+	 * @see com.example.spaceship.classes.Weapon#name
+	 * @see com.example.spaceship.classes.Weapon#damage
+	 * @see com.example.spaceship.classes.Weapon#speed
+	 * @see com.example.spaceship.classes.Weapon#price
+	 * @see com.example.spaceship.classes.Weapon#owned
+	 * @see com.example.spaceship.classes.Weapon#equipped
+	 */
+	
+	private void log (long id, String name, int damage, int speed, int price, boolean owned,
+	                  boolean equipped) {
+		Log.d("Weapon#constructor",
+		      String.format("Constructor: All\n" +
+		                    "ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s\n" +
+		                    "Params: ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s",
+		                    this.id,
+		                    this.name,
+		                    this.damage,
+		                    this.speed,
+		                    this.price,
+		                    this.owned,
+		                    this.equipped,
+		                    id,
+		                    name,
+		                    damage,
+		                    speed,
+		                    price,
+		                    owned,
+		                    equipped));
+	}
+	
+	/**
+	 * Logs all the basic fields of the Weapon and all the parameters.
+	 *
+	 * @param name   the name parameter
+	 * @param damage the damage parameter
+	 * @param speed  the speed parameter
+	 * @param price  the price parameter
+	 *
+	 * @see com.example.spaceship.classes.Weapon#name
+	 * @see com.example.spaceship.classes.Weapon#damage
+	 * @see com.example.spaceship.classes.Weapon#speed
+	 * @see com.example.spaceship.classes.Weapon#price
+	 */
+	
+	private void log (String name, int damage, int speed, int price) {
+		Log.d("Weapon#constructor",
+		      String.format("Constructor: Basic\n" +
+		                    "ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s\n" +
+		                    "Params: NAME: %s DMG: %d SPD: %d PRC: %d",
+		                    this.id,
+		                    this.name,
+		                    this.damage,
+		                    this.speed,
+		                    this.price,
+		                    this.owned,
+		                    this.equipped,
+		                    name,
+		                    damage,
+		                    speed,
+		                    price));
+	}
+	
+	/**
+	 * Logs all the basic fields of the Weapon and all the parameters.
+	 *
+	 * @param weapon the {@link com.example.spaceship.classes.Weapon weapon} parameter.
+	 *
+	 * @see com.example.spaceship.classes.Weapon
+	 * @see com.example.spaceship.classes.Weapon#id
+	 * @see com.example.spaceship.classes.Weapon#name
+	 * @see com.example.spaceship.classes.Weapon#damage
+	 * @see com.example.spaceship.classes.Weapon#speed
+	 * @see com.example.spaceship.classes.Weapon#price
+	 * @see com.example.spaceship.classes.Weapon#owned
+	 * @see com.example.spaceship.classes.Weapon#equipped
+	 */
+	
+	private void log (Weapon weapon) {
+		Log.d("Weapon#constructor",
+		      String.format("Constructor: Weapon\n" +
+		                    "ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s\n" +
+		                    "Params: ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s",
+		                    this.id,
+		                    this.name,
+		                    this.damage,
+		                    this.speed,
+		                    this.price,
+		                    this.owned,
+		                    this.equipped,
+		                    weapon.id,
+		                    weapon.name,
+		                    weapon.damage,
+		                    weapon.speed,
+		                    weapon.price,
+		                    weapon.owned,
+		                    weapon.equipped));
 	}
 }

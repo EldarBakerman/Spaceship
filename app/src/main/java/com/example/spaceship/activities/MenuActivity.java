@@ -27,4 +27,10 @@ public class MenuActivity extends AppCompatActivity {
 		intent.putExtra("userId", getIntent().getLongExtra("userId", -1));
 		startActivity(intent);
 	}
+	
+	public void startUser (View view) {
+		final Intent intent = new Intent(MenuActivity.this, UserActivity.class);
+		intent.putExtra("userId", getIntent().getLongExtra("userId", -1));
+		startActivity(intent);
+	}
 }

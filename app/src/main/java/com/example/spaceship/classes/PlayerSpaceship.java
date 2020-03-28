@@ -88,6 +88,7 @@ public class PlayerSpaceship extends Spaceship {
 	public PlayerSpaceship (Drawable image) {
 		super(image, DEFAULT_HP);
 		this.weapon = Weapon.WEAPON_0;
+		this.weapon.setOwned(true);
 		this.weapon.setEquipped(true);
 		PlayerSpaceship.equippedWeapon = this.weapon;
 	}

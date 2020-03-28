@@ -32,6 +32,29 @@ public class StoreWeaponAdapter extends ArrayAdapter<Weapon> {
 		this.weapons = weapons;
 	}
 	
+	public static void setButtonFormat (Resources resources, Weapon weapon, Button button) {
+		Log.d("buttonFormat", "Start");
+		if (weapon.isOwned())
+			if (weapon.isEquipped()) {
+				Log.d("buttonFormat", "Owned & Equipped");
+				button.setText(resources.getString(R.string.equipped));
+				button.setBackgroundColor(Color.CYAN);
+			} else {
+				Log.d("buttonFormat", "Owned & Not Equipped");
+				button.setText(resources.getString(R.string.equip));
+				button.setBackgroundColor(Color.YELLOW);
+			}
+		else {
+			Log.d("buttonFormat", "Not Owned");
+			String buy = String.format(Locale.ENGLISH,
+			                           "%s%d",
+			                           resources.getString(R.string.buy),
+			                           weapon.getPrice());
+			button.setText(buy);
+			button.setBackgroundColor(Color.GREEN);
+		}
+	}
+	
 	@NonNull
 	@Override
 	public View getView (int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -63,28 +86,5 @@ public class StoreWeaponAdapter extends ArrayAdapter<Weapon> {
 		setButtonFormat(convertView.getResources(), weapon, buyBtn);
 		
 		return convertView;
-	}
-	
-	public static void setButtonFormat (Resources resources, Weapon weapon, Button button) {
-		Log.d("buttonFormat", "Start");
-		if (weapon.isOwned())
-			if (weapon.isEquipped()) {
-				Log.d("buttonFormat", "Owned & Equipped");
-				button.setText(resources.getString(R.string.equipped));
-				button.setBackgroundColor(Color.CYAN);
-			} else {
-				Log.d("buttonFormat", "Owned & Not Equipped");
-				button.setText(resources.getString(R.string.equip));
-				button.setBackgroundColor(Color.YELLOW);
-			}
-		else {
-			Log.d("buttonFormat", "Not Owned");
-			String buy = String.format(Locale.ENGLISH,
-			                           "%s%d",
-			                           resources.getString(R.string.buy),
-			                           weapon.getPrice());
-			button.setText(buy);
-			button.setBackgroundColor(Color.GREEN);
-		}
 	}
 }

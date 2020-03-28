@@ -4,13 +4,6 @@
           package="com.example.spaceship">
 	
 	<dist:module dist:instant="true" />
-	<uses-permission
-		android:name="android.permission.CAMERA"
-		android:required="true" />
-	
-	<uses-feature
-		android:name="android.hardware.camera"
-		android:required="true" />
 	
 	<application
 		android:allowBackup="false"
@@ -19,12 +12,19 @@
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
-		<activity android:name=".activities.StoreActivity" />
+		<activity
+			android:name=".activities.UserActivity"
+			android:launchMode="singleTask" />
+		<activity
+			android:name=".activities.StoreActivity"
+			android:launchMode="singleTask" />
 		<activity
 			android:name=".activities.GameActivity"
 			android:launchMode="singleTask" />
 		<activity android:name=".activities.MenuActivity" />
-		<activity android:name=".activities.SplashActivity">
+		<activity
+			android:name=".activities.SplashActivity"
+			android:launchMode="singleTask">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				
@@ -32,6 +32,5 @@
 			</intent-filter>
 		</activity>
 	</application>
-
 
 </manifest>

@@ -341,13 +341,52 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		
 		if (Weapon.weapons.size() > 0) {
 			for (Weapon weapon : Weapon.weapons)
-				if (weapon.getId() == weaponId &&
-				    weapon.getName().equals(weaponName) &&
-				    weapon.getPrice() == weaponPrice &&
-				    weapon.getDamage() == weaponDamage &&
-				    weapon.getSpeed() == weaponSpeed &&
-				    weapon.isOwned() == weaponOwned &&
-				    weapon.isEquipped() == weaponEquipped)
+				if (weapon.getId() == weaponId)
+					return weapon;
+			return null;
+		} else
+			return new Weapon(weaponId,
+			                  weaponName,
+			                  weaponDamage,
+			                  weaponSpeed,
+			                  weaponPrice,
+			                  weaponOwned,
+			                  weaponEquipped);
+	}
+	
+	public Weapon getWeapon (String name) {
+		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_WEAPONS,
+		                               WEAPONS_COLUMNS,
+		                               DatabaseOpenHelper.WEAPONS_COLUMN_NAME + " = " + name,
+		                               null,
+		                               null,
+		                               null,
+		                               null);
+		cursor.moveToFirst();
+		
+		if (cursor.getCount() <= 0)
+			return null;
+		
+		long weaponId =
+				cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_ID));
+		String weaponName =
+				cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_NAME));
+		int weaponPrice =
+				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_PRICE));
+		int weaponDamage =
+				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_DAMAGE));
+		int weaponSpeed =
+				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_SPEED));
+		boolean weaponOwned = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(
+				DatabaseOpenHelper.WEAPONS_COLUMN_OWNED)));
+		boolean weaponEquipped = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(
+				DatabaseOpenHelper.WEAPONS_COLUMN_EQUIPPED)));
+		
+		cursor.close();
+		
+		if (Weapon.weapons.size() > 0) {
+			for (Weapon weapon : Weapon.weapons)
+				if (weapon.getName().equals(weaponName))
 					return weapon;
 			return null;
 		} else
@@ -454,7 +493,9 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			boolean weaponEquipped = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(
 					DatabaseOpenHelper.WEAPONS_COLUMN_EQUIPPED)));
 			
-			if (Weapon.weapons.size() > 0) {
+			if (Weapon.weapons != null &&
+			    Weapon.weapons.size() > 0 &&
+			    Weapon.weapons.size() >= weaponId) {
 				for (Weapon weapon : Weapon.weapons)
 					if (weapon.getId() == weaponId &&
 					    weapon.getName().equals(weaponName) &&
@@ -468,10 +509,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 					}
 			} else
 				weapons.add(new Weapon(weaponId,
-				                       weaponName,
-				                       weaponPrice,
-				                       weaponDamage,
-				                       weaponSpeed,
+				                       weaponName, weaponDamage, weaponSpeed, weaponPrice,
 				                       weaponOwned,
 				                       weaponEquipped));
 		}

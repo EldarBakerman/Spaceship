@@ -8,6 +8,11 @@
 	<string name="damage">"Damage: "</string>
 	<string name="speed">"Speed: "</string>
 	<string name="take_photo">Take photo</string>
-	<string name="points">"POINTS : "</string>
+	<string name="points">"Points: "</string>
 	<string name="time">"TIME: "</string>
+	<string name="username">"Username: "</string>
+	<string name="highscore">"Highscore: "</string>
+	<string name="account">Account</string>
+	<string name="delete_account">Delete Account</string>
+	<string name="update_account">Update Account</string>
 </resources>

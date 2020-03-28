@@ -118,20 +118,6 @@ public class Spaceship {
 	}
 	
 	/**
-	 * A method that initializes the Spaceship's healthbar with relative coordinates and size to
-	 * the current spaceship's position and size.
-	 */
-	
-	public void initHealthbar () {
-		Rect bounds = this.image.copyBounds();
-		int width = bounds.right - bounds.left;
-		this.healthbar.set((bounds.left + ((float) width / 2)) - 75,
-		                   bounds.bottom + 25,
-		                   (bounds.right - ((float) width / 2)) + 75,
-		                   bounds.bottom + 50);
-	}
-	
-	/**
 	 * A constructor used by the Database that is based on the default fields of the spaceship
 	 * based
 	 * on the type.
@@ -263,6 +249,20 @@ public class Spaceship {
 		this.healthbar = healthbar;
 		this.hpText    = hpText;
 		this.hpLayout  = hpLayout;
+	}
+	
+	/**
+	 * A method that initializes the Spaceship's healthbar with relative coordinates and size to
+	 * the current spaceship's position and size.
+	 */
+	
+	public void initHealthbar () {
+		Rect bounds = this.image.copyBounds();
+		int width = bounds.right - bounds.left;
+		this.healthbar.set((bounds.left + ((float) width / 2)) - 75,
+		                   bounds.bottom + 25,
+		                   (bounds.right - ((float) width / 2)) + 75,
+		                   bounds.bottom + 50);
 	}
 	
 	/**
@@ -524,7 +524,7 @@ public class Spaceship {
 	 * @see com.example.spaceship.classes.Spaceship#explosion
 	 */
 	
-	public void setExplosion (Drawable explosion) {
+	private void setExplosion (Drawable explosion) {
 		this.explosion = explosion;
 		this.exploding = true;
 	}

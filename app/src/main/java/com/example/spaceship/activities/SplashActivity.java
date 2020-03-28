@@ -69,6 +69,7 @@ public class SplashActivity extends AppCompatActivity {
 				return;
 			}
 			
+			user.setName(inputString);
 			long userId = database.insert(user).getId();
 			getSharedPreferences("Splash", MODE_PRIVATE).edit().putLong("userId", userId).apply();
 			Intent intent = new Intent(SplashActivity.this, MenuActivity.class);

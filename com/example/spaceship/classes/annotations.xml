@@ -1,8 +1,31 @@
 <root>
+	<item name='com.example.spaceship.classes.EnemySpaceship'>
+		<annotation name='java.lang.SuppressWarnings'>
+			<val
+				val="{&quot;unused&quot; , &quot;WeakerAccess&quot;, &quot;RedundantSuppression&quot;}" />
+		</annotation>
+	</item>
 	<item name='com.example.spaceship.classes.EnemySpaceship int getType()'>
 		<annotation name='org.jetbrains.annotations.Range'>
 			<val name="from" val="1" />
 			<val name="to" val="4" />
+		</annotation>
+	</item>
+	<item name='com.example.spaceship.classes.EnemySpaceship.EnemyType'>
+		<annotation name='java.lang.SuppressWarnings'>
+			<val val="&quot;unused&quot;" />
+		</annotation>
+	</item>
+	<item name='com.example.spaceship.classes.User'>
+		<annotation name='java.lang.SuppressWarnings'>
+			<val
+				val="{&quot;WeakerAccess&quot;, &quot;RedundantSuppression&quot;, &quot;unused&quot;}" />
+		</annotation>
+	</item>
+	<item name='com.example.spaceship.classes.Weapon'>
+		<annotation name='java.lang.SuppressWarnings'>
+			<val
+				val="{&quot;WeakerAccess&quot;, &quot;RedundantSuppression&quot;, &quot;unused&quot;}" />
 		</annotation>
 	</item>
 </root>
