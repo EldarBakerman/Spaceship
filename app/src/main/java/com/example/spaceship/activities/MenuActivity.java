@@ -17,12 +17,20 @@ public class MenuActivity extends AppCompatActivity {
 	}
 	
 	public void startGame (View view) {
-		startActivity(new Intent(MenuActivity.this, GameActivity.class));
+		Intent intent = new Intent(MenuActivity.this, GameActivity.class);
+		intent.putExtra("userId", getIntent().getLongExtra("userId", -1));
+		startActivity(intent);
 	}
 	
-	//TODO: Store Activity
-	//    public void startStore(View view) {
-	//        startActivity(new Intent(MenuActivity.this, StoreActivity.class));
-	//    }
-	//TODO: WeaponStore class
+	public void startStore (View view) {
+		Intent intent = new Intent(MenuActivity.this, StoreActivity.class);
+		intent.putExtra("userId", getIntent().getLongExtra("userId", -1));
+		startActivity(intent);
+	}
+	
+	public void startUser (View view) {
+		final Intent intent = new Intent(MenuActivity.this, UserActivity.class);
+		intent.putExtra("userId", getIntent().getLongExtra("userId", -1));
+		startActivity(intent);
+	}
 }

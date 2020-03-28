@@ -6,15 +6,25 @@
 	<dist:module dist:instant="true" />
 	
 	<application
-		android:allowBackup="true"
+		android:allowBackup="false"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
-		<activity android:name=".activities.GameActivity" />
+		<activity
+			android:name=".activities.UserActivity"
+			android:launchMode="singleTask" />
+		<activity
+			android:name=".activities.StoreActivity"
+			android:launchMode="singleTask" />
+		<activity
+			android:name=".activities.GameActivity"
+			android:launchMode="singleTask" />
 		<activity android:name=".activities.MenuActivity" />
-		<activity android:name=".activities.SplashActivity">
+		<activity
+			android:name=".activities.SplashActivity"
+			android:launchMode="singleTask">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				

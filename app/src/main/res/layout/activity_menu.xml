@@ -24,5 +24,14 @@
 		android:onClick="startStore"
 		android:text="@string/menu_store"
 		android:textAllCaps="false" />
+	
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:backgroundTint="@android:color/holo_orange_light"
+		android:gravity="center"
+		android:onClick="startUser"
+		android:text="@string/account"
+		android:textAllCaps="false" />
 
 </LinearLayout>
