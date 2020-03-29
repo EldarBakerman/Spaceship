@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,6 +12,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.BatteryManager;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.Gravity;
@@ -20,6 +22,8 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 
 import com.example.spaceship.R;
 import com.example.spaceship.activities.GameActivity;
@@ -153,6 +157,15 @@ public class GameView extends View {
 	 */
 	
 	private LinearLayout infoLayout;
+	
+	/**
+	 * An {@link android.graphics.drawable.Drawable indicator} that shows the current status of the
+	 * battery.
+	 *
+	 * @see android.content.BroadcastReceiver
+	 */
+	
+	private Drawable battery;
 	
 	/**
 	 * The {@link android.graphics.Paint paint} for the stroke of the {@link android.graphics.RectF
@@ -309,7 +322,6 @@ public class GameView extends View {
 		userPoints = user.getPoints();
 		points     = activity.getIntent().getIntExtra("points", 0);
 		
-		
 		// Player
 		
 		player   = new PlayerSpaceship(getResources().getDrawable(R.drawable.spaceship1, null));
@@ -362,6 +374,10 @@ public class GameView extends View {
 		
 		infoLayout.addView(timerText);
 		infoLayout.addView(pointsText);
+		
+		// Battery Indicator
+		
+		setBatteryRes(context);
 		
 		// Player & Player Healthbar
 		
@@ -547,6 +563,21 @@ public class GameView extends View {
 		infoLayout.layout(0, 0, getWidth(), getHeight());
 		infoLayout.draw(canvas);
 		
+		setBatteryRes(getContext());
+		if (battery != null) {
+			battery.setBounds(getWidth() - 200, 90, getWidth() - 100, 190);
+			battery.draw(canvas);
+			final Rect bounds = battery.getBounds();
+			Log.d("GameView#onDraw",
+			      String.format(Locale.ENGLISH,
+			                    "left: %d right: %d top: %d bottom: %d",
+			                    bounds.left,
+			                    bounds.right,
+			                    bounds.top,
+			                    bounds.bottom));
+		} else {
+			Log.d("GameView#onDraw", "Battery null");
+		}
 		
 		if (timerTick) {
 			animateSpaceship(Integer.parseInt(timerText.getText()
@@ -570,11 +601,8 @@ public class GameView extends View {
 			if (player.reduceHP(PLAYER_MISS_DAMAGE) <= 0)
 				explode(player);
 		} else if (hit != null) {
-			Log.d("onDraw", "hit != null");
-			if (hit.reduceHP(player.getWeapon().getDamage()) <= 0) {
-				Log.d("onDraw", "reduceHP <= 0");
+			if (hit.reduceHP(player.getWeapon().getDamage()) <= 0)
 				explode(hit);
-			}
 			hit = null;
 		}
 		
@@ -1028,8 +1056,29 @@ public class GameView extends View {
 		endPaint.setTypeface(Typeface.DEFAULT_BOLD);
 		
 		canvas.drawText("Tap anywhere to exit",
-		                (float) getWidth() / 2,
-		                (float) getHeight() / 2 + 100, endPaint);
+		                (float) getWidth() / 2, (float) getHeight() / 2 + 100, endPaint);
+	}
+	
+	private void setBatteryRes (Context context) {
+		IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+		@Nullable Intent batteryStatus = context.registerReceiver(null, intentFilter);
+		
+		assert batteryStatus != null : "batteryStatus is null";
+		int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+		int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+		
+		float percent = level * 100 / (float) scale;
+		
+		if (percent > 80)
+			battery = getRes("battery_5");
+		else if (percent <= 80 && percent > 60)
+			battery = getRes("battery_4");
+		else if (percent <= 60 && percent > 40)
+			battery = getRes("battery_3");
+		else if (percent <= 40 && percent > 20)
+			battery = getRes("battery_2");
+		else
+			battery = getRes("battery_1");
 	}
 }
 	

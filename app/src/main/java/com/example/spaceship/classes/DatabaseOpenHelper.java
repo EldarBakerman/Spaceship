@@ -508,8 +508,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 						break;
 					}
 			} else
-				weapons.add(new Weapon(weaponId,
-				                       weaponName, weaponDamage, weaponSpeed, weaponPrice,
+				weapons.add(new Weapon(weaponId, weaponName, weaponDamage, weaponSpeed,
+				                       weaponPrice,
 				                       weaponOwned,
 				                       weaponEquipped));
 		}

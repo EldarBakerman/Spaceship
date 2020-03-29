@@ -28,8 +28,24 @@ public class SplashActivity extends AppCompatActivity {
 		SharedPreferences sharedPreferences = getSharedPreferences("Splash", MODE_PRIVATE);
 		
 		if (database.getAllWeapons() == null || database.getAllWeapons().isEmpty())
-			for (Weapon weapon : Weapon.weapons)
+			for (Weapon weapon : Weapon.weapons) {
+				switch (weapon.getName()) {
+					case "Prism":
+						weapon.setImage(getResources().getDrawable(R.drawable.blue_laser, null));
+						break;
+					case "Finisher":
+						weapon.setImage(getResources().getDrawable(R.drawable.green_laser, null));
+						break;
+					case "Purity":
+						weapon.setImage(getResources().getDrawable(R.drawable.yellow_laser, null));
+						break;
+					case "Default":
+					default:
+						weapon.setImage(getResources().getDrawable(R.drawable.red_laser, null));
+						break;
+				}
 				database.insert(weapon);
+			}
 		
 		long userId;
 		
