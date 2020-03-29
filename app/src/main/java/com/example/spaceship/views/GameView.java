@@ -308,6 +308,21 @@ public class GameView extends View {
 	 * mechanics.
 	 *
 	 * @param context {@link Activity activity} of the game
+	 *
+	 * @see com.example.spaceship.views.GameView#user
+	 * @see com.example.spaceship.views.GameView#points
+	 * @see com.example.spaceship.views.GameView#userPoints
+	 * @see com.example.spaceship.views.GameView#player
+	 * @see com.example.spaceship.views.GameView#hbFill
+	 * @see com.example.spaceship.views.GameView#hbStroke
+	 * @see com.example.spaceship.views.GameView#infoLayout
+	 * @see com.example.spaceship.views.GameView#timerText
+	 * @see com.example.spaceship.views.GameView#timerTick
+	 * @see com.example.spaceship.views.GameView#pointsText
+	 * @see com.example.spaceship.views.GameView#battery
+	 * @see com.example.spaceship.views.GameView#dPlayer
+	 * @see com.example.spaceship.views.GameView#laser
+	 * @see java.util.Timer
 	 */
 	
 	public GameView (Context context) {
@@ -426,6 +441,12 @@ public class GameView extends View {
 	 * If the Spaceship is an enemy, increases the user's points.
 	 *
 	 * @param spaceship the spaceship to explode.
+	 *
+	 * @see android.graphics.drawable.Drawable
+	 * @see com.example.spaceship.classes.Spaceship
+	 * @see com.example.spaceship.classes.PlayerSpaceship
+	 * @see com.example.spaceship.classes.EnemySpaceship
+	 * @see java.util.Timer
 	 */
 	
 	private void explode (Spaceship spaceship) {
@@ -471,6 +492,7 @@ public class GameView extends View {
 	 * @return the {@link android.graphics.drawable.Drawable drawable} with the corresponding name
 	 *
 	 * @see android.graphics.drawable.Drawable
+	 * @see android.view.View#getResources()
 	 */
 	
 	private Drawable getRes (String id) {
@@ -490,6 +512,9 @@ public class GameView extends View {
 	 *
 	 * @see android.view.View#performClick()
 	 * @see android.view.View#onTouchEvent(android.view.MotionEvent)
+	 * @see android.view.View#performClick()
+	 * @see com.example.spaceship.views.GameView#onTouchEvent(android.view.MotionEvent)
+	 * @see android.view.View#onTouchEvent(android.view.MotionEvent)
 	 */
 	
 	@Override
@@ -505,9 +530,13 @@ public class GameView extends View {
 	 * Executes {@link com.example.spaceship.views.GameView#performClick()} whenever the screen is
 	 * tapped.
 	 *
-	 * @param event the {@link android.view.MotionEvent motion event} data
+	 * @param event the {@link android.view.MotionEvent event}
 	 *
 	 * @return boolean used by the system
+	 *
+	 * @see GameView#performClick()
+	 * @see android.view.View#performClick()
+	 * @see android.view.View#onTouchEvent(android.view.MotionEvent)
 	 */
 	
 	@Override
@@ -522,9 +551,41 @@ public class GameView extends View {
 	
 	/**
 	 * {@link View#onDraw(Canvas) onDraw} method implemented from {@link View view} that draws the
-	 * entire game.
+	 * entire game and is responsible for the general functioning of the game.
 	 *
 	 * @param canvas canvas to draw on
+	 *
+	 * @see GameView#animateLaser()
+	 * @see GameView#laserTarget()
+	 * @see GameView#launchGame()
+	 * @see android.graphics.Canvas
+	 * @see com.example.spaceship.views.GameView#PLAYER_MISS_DAMAGE
+	 * @see com.example.spaceship.views.GameView#SPACESHIP_POINTS
+	 * @see com.example.spaceship.views.GameView#animateSpaceship(boolean)
+	 * @see com.example.spaceship.views.GameView#battery
+	 * @see com.example.spaceship.views.GameView#dPlayer
+	 * @see com.example.spaceship.views.GameView#endText(android.graphics.Canvas)
+	 * @see com.example.spaceship.views.GameView#enemies
+	 * @see com.example.spaceship.views.GameView#explode(com.example.spaceship.classes.Spaceship)
+	 * @see com.example.spaceship.views.GameView#generateEnemies(int)
+	 * @see com.example.spaceship.views.GameView#hit
+	 * @see com.example.spaceship.views.GameView#initHealthbar(android.graphics.Canvas,
+	 *        com.example.spaceship.classes.Spaceship)
+	 * @see com.example.spaceship.views.GameView#initHp(android.graphics.Canvas,
+	 *        com.example.spaceship.classes.Spaceship)
+	 * @see com.example.spaceship.views.GameView#initLaser()
+	 * @see com.example.spaceship.views.GameView#laser
+	 * @see com.example.spaceship.views.GameView#laserAnimating
+	 * @see com.example.spaceship.views.GameView#loseText(android.graphics.Canvas)
+	 * @see com.example.spaceship.views.GameView#lost
+	 * @see com.example.spaceship.views.GameView#miss
+	 * @see com.example.spaceship.views.GameView#player
+	 * @see com.example.spaceship.views.GameView#setBatteryRes(android.content.Context)
+	 * @see com.example.spaceship.views.GameView#start
+	 * @see com.example.spaceship.views.GameView#tapped
+	 * @see com.example.spaceship.views.GameView#timerTick
+	 * @see com.example.spaceship.views.GameView#win
+	 * 		com.example.spaceship.classes.Spaceship)
 	 */
 	
 	@Override
@@ -636,6 +697,9 @@ public class GameView extends View {
 	 * The text that announces that the game is over and that the user has lost.
 	 *
 	 * @param canvas the canvas on which the text is drawn.
+	 *
+	 * @see android.text.TextPaint
+	 * @see android.graphics.Canvas
 	 */
 	
 	private void loseText (Canvas canvas) {
@@ -653,6 +717,11 @@ public class GameView extends View {
 	/**
 	 * Launches a new game, if won, passes the points value to the new game and updates the
 	 * highscore of the {@link com.example.spaceship.classes.User user}.
+	 *
+	 * @see com.example.spaceship.views.GameView#points
+	 * @see com.example.spaceship.views.GameView#userPoints
+	 * @see com.example.spaceship.views.GameView#user
+	 * @see com.example.spaceship.activities.SplashActivity#database
 	 */
 	
 	private void launchGame () {
@@ -686,6 +755,9 @@ public class GameView extends View {
 	 * @throws AssertionError an error thrown if the amount is smaller than 1 or bigger than 6.
 	 * @throws AssertionError an error thrown if the method is called after the first time the
 	 *                        canvas is initialized.
+	 * @see com.example.spaceship.classes.EnemySpaceship
+	 * @see com.example.spaceship.views.GameView#enemies
+	 * @see android.graphics.drawable.Drawable
 	 */
 	
 	private synchronized void generateEnemies (int amount) throws AssertionError {
@@ -865,6 +937,11 @@ public class GameView extends View {
 	 * @param left a parameter that indicates whether the
 	 *             {@link com.example.spaceship.classes.PlayerSpaceship
 	 *             spaceship} should move left or right.
+	 *
+	 * @see com.example.spaceship.views.GameView#player
+	 * @see com.example.spaceship.classes.Spaceship
+	 * @see android.graphics.drawable.Drawable
+	 * @see android.animation.ValueAnimator
 	 */
 	
 	private void animateSpaceship (boolean left) {
@@ -892,6 +969,8 @@ public class GameView extends View {
 	
 	/**
 	 * Initializes the laser by setting its coordinates to the gun of the spaceship.
+	 *
+	 * @see GameView#laser
 	 */
 	
 	private void initLaser () {
@@ -909,6 +988,9 @@ public class GameView extends View {
 	 * @return the {@link com.example.spaceship.classes.EnemySpaceship spaceship} that the laser
 	 * 		will hit. Null if laser's X coordinate is not in range of any {@link
 	 *        com.example.spaceship.classes.EnemySpaceship spaceship}
+	 *
+	 * @see com.example.spaceship.classes.EnemySpaceship
+	 * @see com.example.spaceship.views.GameView#laser
 	 */
 	
 	private EnemySpaceship laserTarget () {
@@ -935,6 +1017,11 @@ public class GameView extends View {
 	 *
 	 * @param canvas the canvas on which the healthbar is drawn
 	 * @param sp     the spaceships to initialize the healthbar of
+	 *
+	 * @see com.example.spaceship.classes.Spaceship
+	 * @see com.example.spaceship.views.GameView#hbFill
+	 * @see com.example.spaceship.views.GameView#hbStroke
+	 * @see android.graphics.Paint
 	 */
 	
 	private void initHealthbar (Canvas canvas, Spaceship sp) {
@@ -969,6 +1056,12 @@ public class GameView extends View {
 	 * Animates the laser's movement from the {@link com.example.spaceship.classes.PlayerSpaceship
 	 * player spaceship's} gun to the {@link com.example.spaceship.classes.EnemySpaceship enemy
 	 * spaceship's} bottom coordinate or, if missed, the end of the screen.
+	 *
+	 * @see com.example.spaceship.views.GameView#laser
+	 * @see com.example.spaceship.views.GameView#laserAnimating
+	 * @see GameView#laserTarget()
+	 * @see android.graphics.drawable.Drawable
+	 * @see android.animation.ValueAnimator
 	 */
 	
 	private void animateLaser () {
@@ -1007,6 +1100,10 @@ public class GameView extends View {
 	 *
 	 * @param canvas the canvas on which the healthbar and the text is drawn
 	 * @param sp     the spaceship to initialize the healthbar of
+	 *
+	 * @see com.example.spaceship.classes.Spaceship
+	 * @see android.widget.RelativeLayout
+	 * @see android.widget.TextView
 	 */
 	
 	private void initHp (Canvas canvas, Spaceship sp) {
@@ -1056,8 +1153,25 @@ public class GameView extends View {
 		endPaint.setTypeface(Typeface.DEFAULT_BOLD);
 		
 		canvas.drawText("Tap anywhere to exit",
-		                (float) getWidth() / 2, (float) getHeight() / 2 + 100, endPaint);
+		                (float) getWidth() / 2,
+		                (float) getHeight() / 2 + 100,
+		                endPaint);
 	}
+	
+	/**
+	 * Sets the {@link com.example.spaceship.views.GameView#battery} field to match a {@link
+	 * android.graphics.drawable.Drawable drawable} resource in accordance ot the current battery
+	 * level.
+	 *
+	 * @param context the {@link android.content.Context context} of the activity.
+	 *
+	 * @see android.graphics.drawable.Drawable
+	 * @see android.content.BroadcastReceiver
+	 * @see android.content.IntentFilter
+	 * @see Context#registerReceiver(android.content.BroadcastReceiver, android.content.IntentFilter)
+	 * @see android.graphics.drawable.Drawable
+	 * @see com.example.spaceship.views.GameView#battery
+	 */
 	
 	private void setBatteryRes (Context context) {
 		IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
@@ -1081,5 +1195,5 @@ public class GameView extends View {
 			battery = getRes("battery_1");
 	}
 }
-	
-	
+
+
