@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -11,20 +12,22 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.spaceship.R;
-import com.example.spaceship.classes.DatabaseOpenHelper;
+import com.example.spaceship.classes.Database;
 import com.example.spaceship.classes.User;
 import com.example.spaceship.classes.Weapon;
 
+import java.util.Objects;
+
 public class SplashActivity extends AppCompatActivity {
 	
-	public static DatabaseOpenHelper database;
+	public static Database database;
 	
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash);
 		
-		database = new DatabaseOpenHelper(this);
+		database = new Database(this);
 		SharedPreferences sharedPreferences = getSharedPreferences("Splash", MODE_PRIVATE);
 		
 		if (database.getAllWeapons() == null || database.getAllWeapons().isEmpty())
@@ -46,6 +49,8 @@ public class SplashActivity extends AppCompatActivity {
 				}
 				database.insert(weapon);
 			}
+		Log.d("SplashActivity#create",
+		      "Size: " + Objects.requireNonNull(database.getAllWeapons()).size());
 		
 		long userId;
 		

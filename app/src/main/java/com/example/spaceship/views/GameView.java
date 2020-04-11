@@ -201,11 +201,11 @@ public class GameView extends View {
 	
 	/**
 	 * The current {@link com.example.spaceship.classes.User user}.
-	 * Initialized and updated by the {@link com.example.spaceship.classes.DatabaseOpenHelper
+	 * Initialized and updated by the {@link com.example.spaceship.classes.Database
 	 * database}.
 	 *
 	 * @see com.example.spaceship.classes.User
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see com.example.spaceship.classes.Database
 	 * @see com.example.spaceship.activities.SplashActivity#database
 	 */
 	
@@ -629,13 +629,6 @@ public class GameView extends View {
 			battery.setBounds(getWidth() - 200, 90, getWidth() - 100, 190);
 			battery.draw(canvas);
 			final Rect bounds = battery.getBounds();
-			Log.d("GameView#onDraw",
-			      String.format(Locale.ENGLISH,
-			                    "left: %d right: %d top: %d bottom: %d",
-			                    bounds.left,
-			                    bounds.right,
-			                    bounds.top,
-			                    bounds.bottom));
 		} else {
 			Log.d("GameView#onDraw", "Battery null");
 		}
@@ -832,7 +825,9 @@ public class GameView extends View {
 			final int RIGHT_MARGIN = LEFT_MARGIN_EDGE + WIDTH;
 			final Drawable image = enemies[i].getImage();
 			final Rect enemyBounds = i >= 2 ? enemies[i - 2].getImage().getBounds() : new Rect();
-			final int PREV_BOTTOM_MARGIN = enemyBounds.bottom + 100;
+			final int PREV_BOTTOM = enemyBounds.bottom;
+			final int PREV_BOTTOM_MARGIN = PREV_BOTTOM + 100;
+			
 			
 			/* Pattern 0 (enemy spaceships represented by 0):
 			 * If amount is odd
@@ -920,10 +915,8 @@ public class GameView extends View {
 							                PREV_BOTTOM_MARGIN + HEIGHT);
 						break;
 					case 5:
-						image.setBounds(RIGHT_MARGIN_EDGE - WIDTH,
-						                PREV_BOTTOM_MARGIN,
-						                RIGHT_MARGIN_EDGE,
-						                PREV_BOTTOM_MARGIN + HEIGHT);
+						image.setBounds(RIGHT_MARGIN_EDGE - WIDTH, PREV_BOTTOM,
+						                RIGHT_MARGIN_EDGE, PREV_BOTTOM + HEIGHT);
 						break;
 				}
 			}

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * SQLite Database class that manages the Database of the app
  */
 
-public class DatabaseOpenHelper extends SQLiteOpenHelper {
+public class Database extends SQLiteOpenHelper {
 	
 	// General Database Values
 	private static final String TABLE_SPACESHIPS = "spaceships_table";
@@ -103,7 +104,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 * @param context activity from which the Database is initialized
 	 */
 	
-	public DatabaseOpenHelper (@Nullable Context context) {
+	public Database (@Nullable Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		database = this.getWritableDatabase();
 	}
@@ -122,7 +123,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		values.put("points", user.getPoints());
 		values.put("highscore", user.getHighscore());
 		
-		long id = database.insert(DatabaseOpenHelper.TABLE_USERS, null, values);
+		long id = database.insert(Database.TABLE_USERS, null, values);
 		user.setId(id);
 		return user;
 	}
@@ -136,13 +137,14 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 */
 	
 	public Weapon insert (Weapon weapon) {
+		
 		ContentValues values = new ContentValues();
 		values.put("name", weapon.getName());
 		values.put("price", weapon.getPrice());
 		values.put("damage", weapon.getDamage());
 		values.put("speed", weapon.getSpeed());
 		
-		long id = database.insert(DatabaseOpenHelper.TABLE_WEAPONS, null, values);
+		long id = database.insert(Database.TABLE_WEAPONS, null, values);
 		weapon.setId(id);
 		return weapon;
 	}
@@ -159,7 +161,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put("type", spaceship.getType());
 		
-		long id = database.insert(DatabaseOpenHelper.TABLE_SPACESHIPS, null, values);
+		long id = database.insert(Database.TABLE_SPACESHIPS, null, values);
 		spaceship.setId(id);
 		return spaceship;
 	}
@@ -176,7 +178,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put("type", 0); // PlayerSpaceship doesn't have a type
 		
-		long id = database.insert(DatabaseOpenHelper.TABLE_SPACESHIPS, null, values);
+		long id = database.insert(Database.TABLE_SPACESHIPS, null, values);
 		spaceship.setId(id);
 		return spaceship;
 	}
@@ -188,13 +190,12 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 *
 	 * @return the user that was deleted
 	 *
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getUser(User)
+	 * @see Database#getUser(User)
 	 */
 	
 	public User deleteUser (User user) {
 		User res = getUser(user);
-		database.delete(DatabaseOpenHelper.TABLE_USERS,
-		                DatabaseOpenHelper.USERS_COLUMN_ID + " = " + user.getId(),
+		database.delete(Database.TABLE_USERS, Database.USERS_COLUMN_ID + " = " + user.getId(),
 		                null);
 		return res;
 	}
@@ -206,7 +207,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 *
 	 * @return the desired user from the Database
 	 *
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getUser(long)
+	 * @see Database#getUser(long)
 	 */
 	
 	public User getUser (User user) {
@@ -222,9 +223,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 */
 	
 	public User getUser (long id) {
-		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_USERS,
-		                               USERS_COLUMNS,
-		                               DatabaseOpenHelper.USERS_COLUMN_ID + " = " + id,
+		Cursor cursor = database.query(Database.TABLE_USERS,
+		                               USERS_COLUMNS, Database.USERS_COLUMN_ID + " = " + id,
 		                               null,
 		                               null,
 		                               null,
@@ -234,13 +234,10 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		if (cursor.getCount() <= 0)
 			return null;
 		
-		long userId = cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_ID));
-		String userName =
-				cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_NAME));
-		int userPoints =
-				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_POINTS));
-		int userHighscore =
-				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_HIGHSCORE));
+		long userId = cursor.getLong(cursor.getColumnIndex(Database.USERS_COLUMN_ID));
+		String userName = cursor.getString(cursor.getColumnIndex(Database.USERS_COLUMN_NAME));
+		int userPoints = cursor.getInt(cursor.getColumnIndex(Database.USERS_COLUMN_POINTS));
+		int userHighscore = cursor.getInt(cursor.getColumnIndex(Database.USERS_COLUMN_HIGHSCORE));
 		
 		cursor.close();
 		return new User(userId, userName, userPoints, userHighscore);
@@ -253,14 +250,12 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 *
 	 * @return the user that was deleted
 	 *
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getUser(long)
+	 * @see Database#getUser(long)
 	 */
 	
 	public User deleteUser (long id) {
 		User res = getUser(id);
-		database.delete(DatabaseOpenHelper.TABLE_USERS,
-		                DatabaseOpenHelper.USERS_COLUMN_ID + " = " + id,
-		                null);
+		database.delete(Database.TABLE_USERS, Database.USERS_COLUMN_ID + " = " + id, null);
 		return res;
 	}
 	
@@ -271,13 +266,12 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 *
 	 * @return the weapon that was deleted
 	 *
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getWeapon(com.example.spaceship.classes.Weapon)
+	 * @see Database#getWeapon(com.example.spaceship.classes.Weapon)
 	 */
 	
 	public Weapon deleteWeapon (Weapon weapon) {
 		Weapon res = getWeapon(weapon);
-		database.delete(DatabaseOpenHelper.TABLE_WEAPONS,
-		                DatabaseOpenHelper.WEAPONS_COLUMN_ID + " = " + weapon.getId(),
+		database.delete(Database.TABLE_WEAPONS, Database.WEAPONS_COLUMN_ID + " = " + weapon.getId(),
 		                null);
 		return res;
 	}
@@ -289,7 +283,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 *
 	 * @return the desired {@link com.example.spaceship.classes.Weapon weapon}.
 	 *
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getWeapon(long)
+	 * @see Database#getWeapon(long)
 	 */
 	
 	public Weapon getWeapon (Weapon weapon) {
@@ -310,9 +304,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 */
 	
 	public Weapon getWeapon (long id) {
-		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_WEAPONS,
-		                               WEAPONS_COLUMNS,
-		                               DatabaseOpenHelper.WEAPONS_COLUMN_ID + " = " + id,
+		Cursor cursor = database.query(Database.TABLE_WEAPONS,
+		                               WEAPONS_COLUMNS, Database.WEAPONS_COLUMN_ID + " = " + id,
 		                               null,
 		                               null,
 		                               null,
@@ -322,20 +315,15 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		if (cursor.getCount() <= 0)
 			return null;
 		
-		long weaponId =
-				cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_ID));
-		String weaponName =
-				cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_NAME));
-		int weaponPrice =
-				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_PRICE));
-		int weaponDamage =
-				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_DAMAGE));
-		int weaponSpeed =
-				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_SPEED));
-		boolean weaponOwned = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(
-				DatabaseOpenHelper.WEAPONS_COLUMN_OWNED)));
+		long weaponId = cursor.getLong(cursor.getColumnIndex(Database.WEAPONS_COLUMN_ID));
+		String weaponName = cursor.getString(cursor.getColumnIndex(Database.WEAPONS_COLUMN_NAME));
+		int weaponPrice = cursor.getInt(cursor.getColumnIndex(Database.WEAPONS_COLUMN_PRICE));
+		int weaponDamage = cursor.getInt(cursor.getColumnIndex(Database.WEAPONS_COLUMN_DAMAGE));
+		int weaponSpeed = cursor.getInt(cursor.getColumnIndex(Database.WEAPONS_COLUMN_SPEED));
+		boolean weaponOwned =
+				Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(Database.WEAPONS_COLUMN_OWNED)));
 		boolean weaponEquipped = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(
-				DatabaseOpenHelper.WEAPONS_COLUMN_EQUIPPED)));
+				Database.WEAPONS_COLUMN_EQUIPPED)));
 		
 		cursor.close();
 		
@@ -350,14 +338,12 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			                  weaponDamage,
 			                  weaponSpeed,
 			                  weaponPrice,
-			                  weaponOwned,
-			                  weaponEquipped);
+			                  weaponOwned, weaponEquipped, true);
 	}
 	
 	public Weapon getWeapon (String name) {
-		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_WEAPONS,
-		                               WEAPONS_COLUMNS,
-		                               DatabaseOpenHelper.WEAPONS_COLUMN_NAME + " = " + name,
+		Cursor cursor = database.query(Database.TABLE_WEAPONS,
+		                               WEAPONS_COLUMNS, Database.WEAPONS_COLUMN_NAME + " = " + name,
 		                               null,
 		                               null,
 		                               null,
@@ -367,20 +353,15 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		if (cursor.getCount() <= 0)
 			return null;
 		
-		long weaponId =
-				cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_ID));
-		String weaponName =
-				cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_NAME));
-		int weaponPrice =
-				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_PRICE));
-		int weaponDamage =
-				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_DAMAGE));
-		int weaponSpeed =
-				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_SPEED));
-		boolean weaponOwned = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(
-				DatabaseOpenHelper.WEAPONS_COLUMN_OWNED)));
+		long weaponId = cursor.getLong(cursor.getColumnIndex(Database.WEAPONS_COLUMN_ID));
+		String weaponName = cursor.getString(cursor.getColumnIndex(Database.WEAPONS_COLUMN_NAME));
+		int weaponPrice = cursor.getInt(cursor.getColumnIndex(Database.WEAPONS_COLUMN_PRICE));
+		int weaponDamage = cursor.getInt(cursor.getColumnIndex(Database.WEAPONS_COLUMN_DAMAGE));
+		int weaponSpeed = cursor.getInt(cursor.getColumnIndex(Database.WEAPONS_COLUMN_SPEED));
+		boolean weaponOwned =
+				Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(Database.WEAPONS_COLUMN_OWNED)));
 		boolean weaponEquipped = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(
-				DatabaseOpenHelper.WEAPONS_COLUMN_EQUIPPED)));
+				Database.WEAPONS_COLUMN_EQUIPPED)));
 		
 		cursor.close();
 		
@@ -395,8 +376,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			                  weaponDamage,
 			                  weaponSpeed,
 			                  weaponPrice,
-			                  weaponOwned,
-			                  weaponEquipped);
+			                  weaponOwned, weaponEquipped, true);
 	}
 	
 	/**
@@ -406,14 +386,27 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 *
 	 * @return the weapon that was deleted
 	 *
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper#getWeapon(long)
+	 * @see Database#getWeapon(long)
 	 */
 	
 	public Weapon deleteWeapon (long id) {
 		Weapon res = getWeapon(id);
-		database.delete(DatabaseOpenHelper.TABLE_WEAPONS,
-		                DatabaseOpenHelper.WEAPONS_COLUMN_ID + " = " + id,
-		                null);
+		
+		if (id <= 0 || res == null) {
+			Log.d("deleteWeapon", "Invalid ID");
+			return res;
+		}
+		
+		int ret = database.delete(Database.TABLE_WEAPONS,
+		                          Database.WEAPONS_COLUMN_ID + " = " + id,
+		                          null);
+		
+		if (ret <= 0)
+			Log.d("deleteWeapon", "Failed to delete Weapon " + res.getName() + " with ID" + id);
+		else
+			Log.d("deleteWeapon",
+			      "Successfully deleted Weapon " + res.getName() + " with ID " + id);
+		
 		return res;
 	}
 	
@@ -429,8 +422,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public List<User> getAllUsers () {
 		List<User> users = new ArrayList<>();
-		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_USERS,
-		                               DatabaseOpenHelper.USERS_COLUMNS,
+		Cursor cursor = database.query(Database.TABLE_USERS, Database.USERS_COLUMNS,
 		                               null,
 		                               null,
 		                               null,
@@ -441,14 +433,11 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			return null;
 		
 		while (cursor.moveToNext()) {
-			long userId =
-					cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_ID));
-			String userName =
-					cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_NAME));
-			int userPoints =
-					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_POINTS));
+			long userId = cursor.getLong(cursor.getColumnIndex(Database.USERS_COLUMN_ID));
+			String userName = cursor.getString(cursor.getColumnIndex(Database.USERS_COLUMN_NAME));
+			int userPoints = cursor.getInt(cursor.getColumnIndex(Database.USERS_COLUMN_POINTS));
 			int userHighscore =
-					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.USERS_COLUMN_HIGHSCORE));
+					cursor.getInt(cursor.getColumnIndex(Database.USERS_COLUMN_HIGHSCORE));
 			users.add(new User(userId, userName, userPoints, userHighscore));
 		}
 		
@@ -467,7 +456,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public List<Weapon> getAllWeapons () {
 		List<Weapon> weapons = new ArrayList<>();
-		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_WEAPONS,
+		Cursor cursor = database.query(Database.TABLE_WEAPONS,
 		                               WEAPONS_COLUMNS,
 		                               null,
 		                               null,
@@ -478,20 +467,16 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			return null;
 		
 		while (cursor.moveToNext()) {
-			long weaponId =
-					cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_ID));
+			long weaponId = cursor.getLong(cursor.getColumnIndex(Database.WEAPONS_COLUMN_ID));
 			String weaponName =
-					cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_NAME));
-			int weaponPrice =
-					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_PRICE));
-			int weaponDamage =
-					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_DAMAGE));
-			int weaponSpeed =
-					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.WEAPONS_COLUMN_SPEED));
+					cursor.getString(cursor.getColumnIndex(Database.WEAPONS_COLUMN_NAME));
+			int weaponPrice = cursor.getInt(cursor.getColumnIndex(Database.WEAPONS_COLUMN_PRICE));
+			int weaponDamage = cursor.getInt(cursor.getColumnIndex(Database.WEAPONS_COLUMN_DAMAGE));
+			int weaponSpeed = cursor.getInt(cursor.getColumnIndex(Database.WEAPONS_COLUMN_SPEED));
 			boolean weaponOwned = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(
-					DatabaseOpenHelper.WEAPONS_COLUMN_OWNED)));
+					Database.WEAPONS_COLUMN_OWNED)));
 			boolean weaponEquipped = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(
-					DatabaseOpenHelper.WEAPONS_COLUMN_EQUIPPED)));
+					Database.WEAPONS_COLUMN_EQUIPPED)));
 			
 			if (Weapon.weapons != null &&
 			    Weapon.weapons.size() > 0 &&
@@ -510,8 +495,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			} else
 				weapons.add(new Weapon(weaponId, weaponName, weaponDamage, weaponSpeed,
 				                       weaponPrice,
-				                       weaponOwned,
-				                       weaponEquipped));
+				                       weaponOwned, weaponEquipped, true));
 		}
 		
 		cursor.close();
@@ -544,9 +528,9 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 */
 	
 	public Spaceship getSpaceship (long id) {
-		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_SPACESHIPS,
+		Cursor cursor = database.query(Database.TABLE_SPACESHIPS,
 		                               SPACESHIPS_COLUMNS,
-		                               DatabaseOpenHelper.SPACESHIPS_COLUMN_ID + " = " + id,
+		                               Database.SPACESHIPS_COLUMN_ID + " = " + id,
 		                               null,
 		                               null,
 		                               null,
@@ -556,10 +540,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		if (cursor.getCount() <= 0)
 			return null;
 		
-		long spaceshipId =
-				cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.SPACESHIPS_COLUMN_ID));
-		int spaceshipType =
-				cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.SPACESHIPS_COLUMN_TYPE));
+		long spaceshipId = cursor.getLong(cursor.getColumnIndex(Database.SPACESHIPS_COLUMN_ID));
+		int spaceshipType = cursor.getInt(cursor.getColumnIndex(Database.SPACESHIPS_COLUMN_TYPE));
 		
 		cursor.close();
 		return spaceshipType > 0
@@ -577,8 +559,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public Spaceship deleteSpaceship (Spaceship spaceship) {
 		Spaceship res = getSpaceship(spaceship.getId());
-		database.delete(DatabaseOpenHelper.TABLE_SPACESHIPS,
-		                DatabaseOpenHelper.SPACESHIPS_COLUMN_ID + " = " + spaceship.getId(),
+		database.delete(Database.TABLE_SPACESHIPS,
+		                Database.SPACESHIPS_COLUMN_ID + " = " + spaceship.getId(),
 		                null);
 		return res;
 	}
@@ -594,8 +576,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public Spaceship deleteSpaceship (long id) {
 		Spaceship res = getSpaceship(id);
-		database.delete(DatabaseOpenHelper.TABLE_SPACESHIPS,
-		                DatabaseOpenHelper.SPACESHIPS_COLUMN_ID + " = " + id,
+		database.delete(Database.TABLE_SPACESHIPS, Database.SPACESHIPS_COLUMN_ID + " = " + id,
 		                null);
 		return res;
 	}
@@ -610,8 +591,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public List<Spaceship> getAllSpaceships () {
 		List<Spaceship> spaceships = new ArrayList<>();
-		Cursor cursor = database.query(DatabaseOpenHelper.TABLE_SPACESHIPS,
-		                               DatabaseOpenHelper.SPACESHIPS_COLUMNS,
+		Cursor cursor = database.query(Database.TABLE_SPACESHIPS, Database.SPACESHIPS_COLUMNS,
 		                               null,
 		                               null,
 		                               null,
@@ -622,10 +602,9 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			return null;
 		
 		while (cursor.moveToNext()) {
-			long spaceshipId =
-					cursor.getLong(cursor.getColumnIndex(DatabaseOpenHelper.SPACESHIPS_COLUMN_ID));
+			long spaceshipId = cursor.getLong(cursor.getColumnIndex(Database.SPACESHIPS_COLUMN_ID));
 			int spaceshipType =
-					cursor.getInt(cursor.getColumnIndex(DatabaseOpenHelper.SPACESHIPS_COLUMN_TYPE));
+					cursor.getInt(cursor.getColumnIndex(Database.SPACESHIPS_COLUMN_TYPE));
 			
 			spaceships.add(spaceshipType > 0
 			               ? new EnemySpaceship(spaceshipId, spaceshipType)
@@ -648,14 +627,13 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public long update (User user) {
 		ContentValues values = new ContentValues();
-		values.put(DatabaseOpenHelper.USERS_COLUMN_ID, user.getId());
-		values.put(DatabaseOpenHelper.USERS_COLUMN_NAME, user.getName());
-		values.put(DatabaseOpenHelper.USERS_COLUMN_POINTS, user.getPoints());
-		values.put(DatabaseOpenHelper.USERS_COLUMN_HIGHSCORE, user.getHighscore());
+		values.put(Database.USERS_COLUMN_ID, user.getId());
+		values.put(Database.USERS_COLUMN_NAME, user.getName());
+		values.put(Database.USERS_COLUMN_POINTS, user.getPoints());
+		values.put(Database.USERS_COLUMN_HIGHSCORE, user.getHighscore());
 		
-		return database.update(DatabaseOpenHelper.TABLE_USERS,
-		                       values,
-		                       DatabaseOpenHelper.USERS_COLUMN_ID + " = " + user.getId(),
+		return database.update(Database.TABLE_USERS,
+		                       values, Database.USERS_COLUMN_ID + " = " + user.getId(),
 		                       null);
 	}
 	
@@ -673,17 +651,16 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public long update (Weapon weapon) {
 		ContentValues values = new ContentValues();
-		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_ID, weapon.getId());
-		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_NAME, weapon.getName());
-		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_PRICE, weapon.getPrice());
-		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_DAMAGE, weapon.getDamage());
-		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_SPEED, weapon.getSpeed());
-		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_OWNED, weapon.isOwned());
-		values.put(DatabaseOpenHelper.WEAPONS_COLUMN_EQUIPPED, weapon.isEquipped());
+		values.put(Database.WEAPONS_COLUMN_ID, weapon.getId());
+		values.put(Database.WEAPONS_COLUMN_NAME, weapon.getName());
+		values.put(Database.WEAPONS_COLUMN_PRICE, weapon.getPrice());
+		values.put(Database.WEAPONS_COLUMN_DAMAGE, weapon.getDamage());
+		values.put(Database.WEAPONS_COLUMN_SPEED, weapon.getSpeed());
+		values.put(Database.WEAPONS_COLUMN_OWNED, weapon.isOwned());
+		values.put(Database.WEAPONS_COLUMN_EQUIPPED, weapon.isEquipped());
 		
-		return database.update(DatabaseOpenHelper.TABLE_WEAPONS,
-		                       values,
-		                       DatabaseOpenHelper.WEAPONS_COLUMN_ID + " = " + weapon.getId(),
+		return database.update(Database.TABLE_WEAPONS,
+		                       values, Database.WEAPONS_COLUMN_ID + " = " + weapon.getId(),
 		                       null);
 	}
 	
@@ -702,15 +679,14 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public long update (Spaceship spaceship) {
 		ContentValues values = new ContentValues();
-		values.put(DatabaseOpenHelper.SPACESHIPS_COLUMN_ID, spaceship.getId());
-		values.put(DatabaseOpenHelper.SPACESHIPS_COLUMN_TYPE,
+		values.put(Database.SPACESHIPS_COLUMN_ID, spaceship.getId());
+		values.put(Database.SPACESHIPS_COLUMN_TYPE,
 		           spaceship instanceof EnemySpaceship
 		           ? ((EnemySpaceship) spaceship).getType()
 		           : 0);
 		
-		return database.update(DatabaseOpenHelper.TABLE_SPACESHIPS,
-		                       values,
-		                       DatabaseOpenHelper.SPACESHIPS_COLUMN_ID + " = " + spaceship.getId(),
+		return database.update(Database.TABLE_SPACESHIPS,
+		                       values, Database.SPACESHIPS_COLUMN_ID + " = " + spaceship.getId(),
 		                       null);
 	}
 	
@@ -737,7 +713,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	 * @param oldVersion the old version's number.
 	 * @param newVersion the new version's number.
 	 *
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper#onCreate(android.database.sqlite.SQLiteDatabase)
+	 * @see Database#onCreate(android.database.sqlite.SQLiteDatabase)
 	 */
 	
 	@Override

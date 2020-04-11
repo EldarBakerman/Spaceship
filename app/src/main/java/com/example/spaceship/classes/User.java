@@ -4,7 +4,7 @@ package com.example.spaceship.classes;
  * The User class that holds the Player's information such as name, profile picture, current amount
  * of points and highscore.
  *
- * @see com.example.spaceship.classes.DatabaseOpenHelper
+ * @see Database
  */
 
 public class User {
@@ -77,7 +77,7 @@ public class User {
 	 * @see com.example.spaceship.classes.User#name
 	 * @see com.example.spaceship.classes.User#points
 	 * @see com.example.spaceship.classes.User#highscore
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see Database
 	 */
 	
 	public User (long id, String name, int points, int highscore) {

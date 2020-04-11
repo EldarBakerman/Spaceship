@@ -10,6 +10,7 @@ import com.example.spaceship.activities.SplashActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * The {@link com.example.spaceship.classes.PlayerSpaceship player}'s weapon.
@@ -26,17 +27,19 @@ public class Weapon {
 	static {
 		final List<Weapon> allWeapons = SplashActivity.database.getAllWeapons();
 		if (allWeapons == null || allWeapons.isEmpty()) {
-			WEAPON_0          = new Weapon("Default", 5, 2, 0);
+			WEAPON_0          = new Weapon("Default", 5, 2, 0, false);
 			WEAPON_0.owned    = true;
 			WEAPON_0.equipped = true;
-			WEAPON_1          = new Weapon("Prism", 8, 3, 25);
-			WEAPON_2          = new Weapon("Finisher", 12, 1, 50);
-			WEAPON_3          = new Weapon("Purity", 15, 2, 100);
+			WEAPON_1          = new Weapon("Prism", 8, 3, 25, false);
+			WEAPON_2          = new Weapon("Finisher", 12, 1, 50, false);
+			WEAPON_3          = new Weapon("Purity", 15, 2, 100, false);
+			Log.d("Weapon#static", "First; Size: " + (allWeapons != null ? allWeapons.size() : 0));
 		} else {
-			WEAPON_0 = new Weapon(allWeapons.get(0));
-			WEAPON_1 = new Weapon(allWeapons.get(1));
-			WEAPON_2 = new Weapon(allWeapons.get(2));
-			WEAPON_3 = new Weapon(allWeapons.get(3));
+			Log.d("Weapon#static", "Second; Size: " + allWeapons.size());
+			WEAPON_0 = new Weapon(allWeapons.get(0), true);
+			WEAPON_1 = new Weapon(allWeapons.get(1), true);
+			WEAPON_2 = new Weapon(allWeapons.get(2), true);
+			WEAPON_3 = new Weapon(allWeapons.get(3), true);
 		}
 	}
 	
@@ -102,7 +105,7 @@ public class Weapon {
 	 * A constructor of the weapon that is usually used by the Database.
 	 * Adds {@link com.example.spaceship.classes.Weapon weapon} to the {@link
 	 * com.example.spaceship.classes.Weapon#weapons} list and to the {@link
-	 * com.example.spaceship.classes.DatabaseOpenHelper database}.
+	 * Database database}.
 	 *
 	 * @param id       the ID of the weapon in the Database.
 	 * @param name     the name of the weapon.
@@ -111,6 +114,9 @@ public class Weapon {
 	 * @param price    the price of the weapon.
 	 * @param owned    is the weapon currently owned.
 	 * @param equipped is the weapon currently equipped.
+	 * @param ignored  whether the constructor should or shouldn't add, update and remove the
+	 *                 weapon from the
+	 *                 {@link com.example.spaceship.activities.SplashActivity#database}
 	 *
 	 * @see com.example.spaceship.classes.Weapon#id
 	 * @see com.example.spaceship.classes.Weapon#name
@@ -119,20 +125,20 @@ public class Weapon {
 	 * @see com.example.spaceship.classes.Weapon#price
 	 * @see com.example.spaceship.classes.Weapon#owned
 	 * @see com.example.spaceship.classes.Weapon#equipped
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see Database
 	 * @see com.example.spaceship.activities.SplashActivity#database
 	 */
 	
-	public Weapon (long id, String name, int damage, int speed, int price, boolean owned,
-	               boolean equipped) {
-		log(id, name, damage, speed, price, owned, equipped);
+	public Weapon (long id, String name, int damage, int speed, int price, boolean owned, boolean equipped, boolean ignored) {
+		if (!ignored)
+			try {
+				SplashActivity.database.deleteWeapon(this.id);
+				SplashActivity.database.deleteWeapon(id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		
-		try {
-			SplashActivity.database.deleteWeapon(this.id);
-		} catch (Exception e) {
-			Log.d("Weapon#constructor",
-			      String.format("Failed to delete Weapon %s with ID %d", this.name, this.id));
-		}
+		log(id, name, damage, speed, price, owned, equipped, ignored);
 		
 		this.id       = id;
 		this.name     = name;
@@ -151,27 +157,35 @@ public class Weapon {
 			}
 		}
 		
-		if (i == weapons.size())
+		if (i == weapons.size() && weapons.size() < 4)
 			weapons.add(this);
 		
-		try {
-			SplashActivity.database.getWeapon(this.name);
-			SplashActivity.database.update(this);
-		} catch (NullPointerException exception) {
-			exception.printStackTrace();
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			SplashActivity.database.insert(this);
-		}
+		if (!ignored)
+			try {
+				SplashActivity.database.getWeapon(this.name);
+				SplashActivity.database.update(this);
+			} catch (NullPointerException exception) {
+				exception.printStackTrace();
+			} catch (Exception exception) {
+				exception.printStackTrace();
+				Log.d("Weapon#database",
+				      String.format(Locale.ENGLISH,
+				                    "Could not find Weapon %s with ID %d",
+				                    this.name,
+				                    this.id));
+				SplashActivity.database.insert(this);
+			}
 	}
 	
 	/**
 	 * A constructor of the weapon that takes only the most basic arguments.
 	 *
-	 * @param name   the name of the weapon.
-	 * @param damage the damage of the weapon.
-	 * @param speed  the speed of the weapon.
-	 * @param price  the price of the weapon.
+	 * @param name    the name of the weapon.
+	 * @param damage  the damage of the weapon.
+	 * @param speed   the speed of the weapon.
+	 * @param price   the price of the weapon.
+	 * @param ignored whether the constructor should or shouldn't add, update and remove the weapon
+	 *                from the {@link com.example.spaceship.activities.SplashActivity#database}
 	 *
 	 * @see com.example.spaceship.classes.Weapon#name
 	 * @see com.example.spaceship.classes.Weapon#damage
@@ -179,14 +193,15 @@ public class Weapon {
 	 * @see com.example.spaceship.classes.Weapon#price
 	 */
 	
-	public Weapon (String name, int damage, int speed, int price) {
-		log(name, damage, speed, price);
+	public Weapon (String name, int damage, int speed, int price, boolean ignored) {
+		log(id, name, damage, speed, price, owned, equipped, ignored);
 		
-		try {
-			SplashActivity.database.deleteWeapon(this.id);
-		} catch (Exception e) {
-			Log.d("Weapon#constructor", "Cannot find weapon with ID " + this.id);
-		}
+		if (!ignored)
+			try {
+				SplashActivity.database.deleteWeapon(this.id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		
 		this.id     = -1;
 		this.name   = name;
@@ -203,42 +218,47 @@ public class Weapon {
 			}
 		}
 		
-		if (i == weapons.size())
+		if (i == weapons.size() && weapons.size() < 4)
 			weapons.add(this);
 		
-		if (SplashActivity.database != null)
-			this.id = SplashActivity.database.insert(this).id;
+		if (!ignored)
+			if (SplashActivity.database != null)
+				this.id = SplashActivity.database.insert(this).id;
 	}
 	
 	/**
 	 * A constructor of the weapon that takes only the most basic arguments and the image.
 	 * Adds {@link com.example.spaceship.classes.Weapon weapon} to the {@link
 	 * com.example.spaceship.classes.Weapon#weapons} list and to the {@link
-	 * com.example.spaceship.classes.DatabaseOpenHelper database}.
+	 * Database database}.
 	 *
-	 * @param name   the name of the weapon.
-	 * @param damage the damage of the weapon.
-	 * @param speed  the speed of the weapon.
-	 * @param image  the image of the weapon.
-	 * @param price  the price of the weapon.
+	 * @param name    the name of the weapon.
+	 * @param damage  the damage of the weapon.
+	 * @param speed   the speed of the weapon.
+	 * @param image   the image of the weapon.
+	 * @param price   the price of the weapon.
+	 * @param ignored whether the constructor should or shouldn't add, update and remove the weapon
+	 *                from the {@link com.example.spaceship.activities.SplashActivity#database}
 	 *
 	 * @see com.example.spaceship.classes.Weapon#name
 	 * @see com.example.spaceship.classes.Weapon#damage
 	 * @see com.example.spaceship.classes.Weapon#speed
 	 * @see com.example.spaceship.classes.Weapon#price
 	 * @see com.example.spaceship.classes.Weapon#image
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see Database
 	 * @see com.example.spaceship.activities.SplashActivity#database
 	 */
 	
-	public Weapon (String name, int damage, int speed, Drawable image, int price) {
-		log(name, damage, speed, price);
+	public Weapon (String name, int damage, int speed, Drawable image, int price,
+	               boolean ignored) {
+		log(id, name, damage, speed, price, owned, equipped, ignored);
 		
-		try {
-			SplashActivity.database.deleteWeapon(this.id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		if (!ignored)
+			try {
+				SplashActivity.database.deleteWeapon(this.id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		
 		this.id     = -1;
 		this.name   = name;
@@ -256,18 +276,19 @@ public class Weapon {
 			}
 		}
 		
-		if (i == weapons.size())
+		if (i == weapons.size() && weapons.size() < 4)
 			weapons.add(this);
 		
-		try {
-			SplashActivity.database.getWeapon(this.name);
-			SplashActivity.database.update(this);
-		} catch (NullPointerException exception) {
-			exception.printStackTrace();
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			SplashActivity.database.insert(this);
-		}
+		if (!ignored)
+			try {
+				SplashActivity.database.getWeapon(this.name);
+				SplashActivity.database.update(this);
+			} catch (NullPointerException exception) {
+				exception.printStackTrace();
+			} catch (Exception exception) {
+				exception.printStackTrace();
+				SplashActivity.database.insert(this);
+			}
 	}
 	
 	/**
@@ -275,10 +296,12 @@ public class Weapon {
 	 * com.example.spaceship.classes.Weapon weapon}.
 	 * <p>
 	 * Removes previous {@link com.example.spaceship.classes.Weapon weapon} from {@link
-	 * com.example.spaceship.classes.DatabaseOpenHelper database} and adds the new one (if doesn't
+	 * Database database} and adds the new one (if doesn't
 	 * already exist).
 	 *
-	 * @param weapon the other weapon to copy from.
+	 * @param weapon  the other weapon to copy from.
+	 * @param ignored whether the constructor should or shouldn't add, update and remove the weapon
+	 *                from the {@link com.example.spaceship.activities.SplashActivity#database}
 	 *
 	 * @see com.example.spaceship.classes.Weapon
 	 * @see com.example.spaceship.classes.Weapon#id
@@ -289,18 +312,20 @@ public class Weapon {
 	 * @see com.example.spaceship.classes.Weapon#image
 	 * @see com.example.spaceship.classes.Weapon#owned
 	 * @see com.example.spaceship.classes.Weapon#equipped
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see Database
 	 * @see com.example.spaceship.activities.SplashActivity#database
 	 */
 	
-	public Weapon (Weapon weapon) {
-		log(weapon);
+	public Weapon (Weapon weapon, boolean ignored) {
+		log(id, name, damage, speed, price, owned, equipped, ignored);
 		
-		try {
-			SplashActivity.database.deleteWeapon(this.id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		if (!ignored)
+			try {
+				SplashActivity.database.deleteWeapon(this.id);
+				weapons.remove((int) this.id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		
 		this.id       = weapon.getId();
 		this.name     = weapon.getName();
@@ -323,15 +348,16 @@ public class Weapon {
 		if (i == weapons.size())
 			weapons.add(this);
 		
-		try {
-			SplashActivity.database.getWeapon(this.name);
-			SplashActivity.database.update(this);
-		} catch (NullPointerException exception) {
-			exception.printStackTrace();
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			SplashActivity.database.insert(this);
-		}
+		if (!ignored)
+			try {
+				SplashActivity.database.getWeapon(this.name);
+				SplashActivity.database.update(this);
+			} catch (NullPointerException exception) {
+				exception.printStackTrace();
+			} catch (Exception exception) {
+				exception.printStackTrace();
+				SplashActivity.database.insert(this);
+			}
 	}
 	
 	/**
@@ -634,10 +660,9 @@ public class Weapon {
 	 * @see com.example.spaceship.classes.Weapon#equipped
 	 */
 	
-	private void log (long id, String name, int damage, int speed, int price, boolean owned,
-	                  boolean equipped) {
+	private void log (long id, String name, int damage, int speed, int price, boolean owned, boolean equipped, boolean ignored) {
 		Log.d("Weapon#constructor",
-		      String.format("Constructor: All\n" +
+		      String.format((ignored ? "IGNORED" : "") + "Constructor: All\n" +
 		                    "ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s\n" +
 		                    "Params: ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s",
 		                    this.id,
@@ -670,9 +695,9 @@ public class Weapon {
 	 * @see com.example.spaceship.classes.Weapon#price
 	 */
 	
-	private void log (String name, int damage, int speed, int price) {
+	private void log (String name, int damage, int speed, int price, boolean ignored) {
 		Log.d("Weapon#constructor",
-		      String.format("Constructor: Basic\n" +
+		      String.format((ignored ? "IGNORED" : "") + "Constructor: Basic\n" +
 		                    "ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s\n" +
 		                    "Params: NAME: %s DMG: %d SPD: %d PRC: %d",
 		                    this.id,
@@ -703,9 +728,9 @@ public class Weapon {
 	 * @see com.example.spaceship.classes.Weapon#equipped
 	 */
 	
-	private void log (Weapon weapon) {
+	private void log (Weapon weapon, boolean ignored) {
 		Log.d("Weapon#constructor",
-		      String.format("Constructor: Weapon\n" +
+		      String.format((ignored ? "IGNORED" : "") + "Constructor: Weapon\n" +
 		                    "ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s\n" +
 		                    "Params: ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s",
 		                    this.id,

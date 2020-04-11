@@ -75,7 +75,7 @@ public class EnemySpaceship extends Spaceship {
 	 *
 	 * @see com.example.spaceship.classes.Spaceship
 	 * @see com.example.spaceship.classes.EnemySpaceship.EnemyType
-	 * @see com.example.spaceship.classes.DatabaseOpenHelper
+	 * @see Database
 	 */
 	
 	public EnemySpaceship (long id, int type) {

@@ -3,7 +3,6 @@ package com.example.spaceship.classes;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,19 +32,15 @@ public class StoreWeaponAdapter extends ArrayAdapter<Weapon> {
 	}
 	
 	public static void setButtonFormat (Resources resources, Weapon weapon, Button button) {
-		Log.d("buttonFormat", "Start");
 		if (weapon.isOwned())
 			if (weapon.isEquipped()) {
-				Log.d("buttonFormat", "Owned & Equipped");
 				button.setText(resources.getString(R.string.equipped));
 				button.setBackgroundColor(Color.CYAN);
 			} else {
-				Log.d("buttonFormat", "Owned & Not Equipped");
 				button.setText(resources.getString(R.string.equip));
 				button.setBackgroundColor(Color.YELLOW);
 			}
 		else {
-			Log.d("buttonFormat", "Not Owned");
 			String buy = String.format(Locale.ENGLISH,
 			                           "%s%d",
 			                           resources.getString(R.string.buy),
