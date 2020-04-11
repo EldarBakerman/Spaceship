@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.example.spaceship.activities.SplashActivity;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,19 +28,31 @@ public class Weapon {
 	static {
 		final List<Weapon> allWeapons = SplashActivity.database.getAllWeapons();
 		if (allWeapons == null || allWeapons.isEmpty()) {
-			WEAPON_0          = new Weapon("Default", 5, 2, 0, false);
-			WEAPON_0.owned    = true;
-			WEAPON_0.equipped = true;
-			WEAPON_1          = new Weapon("Prism", 8, 3, 25, false);
-			WEAPON_2          = new Weapon("Finisher", 12, 1, 50, false);
-			WEAPON_3          = new Weapon("Purity", 15, 2, 100, false);
+			WEAPON_0 = new Weapon("Default", 5, 2, 0, false);
+			WEAPON_0.setOwned(true);
+			WEAPON_0.setEquipped(true);
+			PlayerSpaceship.setEquippedWeapon(WEAPON_0);
+			WEAPON_1 = new Weapon("Prism", 8, 3, 25, false);
+			WEAPON_2 = new Weapon("Finisher", 12, 1, 50, false);
+			WEAPON_3 = new Weapon("Purity", 15, 2, 100, false);
 			Log.d("Weapon#static", "First; Size: " + (allWeapons != null ? allWeapons.size() : 0));
 		} else {
 			Log.d("Weapon#static", "Second; Size: " + allWeapons.size());
-			WEAPON_0 = new Weapon(allWeapons.get(0), true);
-			WEAPON_1 = new Weapon(allWeapons.get(1), true);
-			WEAPON_2 = new Weapon(allWeapons.get(2), true);
-			WEAPON_3 = new Weapon(allWeapons.get(3), true);
+			WEAPON_0 = new Weapon(allWeapons.get(0), false);
+			WEAPON_1 = new Weapon(allWeapons.get(1), false);
+			WEAPON_2 = new Weapon(allWeapons.get(2), false);
+			WEAPON_3 = new Weapon(allWeapons.get(3), false);
+			
+			try {
+				for (int i = 1; i < 4; i++) {
+					final Field field = Weapon.class.getField("WEAPON_" + i);
+					Weapon weapon = (Weapon) field.get(null);
+					if (weapon != null && weapon.owned && weapon.equipped)
+						PlayerSpaceship.setEquippedWeapon(weapon);
+				}
+			} catch (NoSuchFieldException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -129,7 +142,8 @@ public class Weapon {
 	 * @see com.example.spaceship.activities.SplashActivity#database
 	 */
 	
-	public Weapon (long id, String name, int damage, int speed, int price, boolean owned, boolean equipped, boolean ignored) {
+	public Weapon (long id, String name, int damage, int speed, int price, boolean owned,
+	               boolean equipped, boolean ignored) {
 		if (!ignored)
 			try {
 				SplashActivity.database.deleteWeapon(this.id);
@@ -175,6 +189,12 @@ public class Weapon {
 				                    this.id));
 				SplashActivity.database.insert(this);
 			}
+		
+		if (this.equipped) {
+			PlayerSpaceship.getEquippedWeapon().setEquipped(false);
+			this.equipped = true;
+			PlayerSpaceship.setEquippedWeapon(this);
+		}
 	}
 	
 	/**
@@ -224,6 +244,12 @@ public class Weapon {
 		if (!ignored)
 			if (SplashActivity.database != null)
 				this.id = SplashActivity.database.insert(this).id;
+		
+		if (this.equipped) {
+			PlayerSpaceship.getEquippedWeapon().setEquipped(false);
+			this.equipped = true;
+			PlayerSpaceship.setEquippedWeapon(this);
+		}
 	}
 	
 	/**
@@ -289,6 +315,12 @@ public class Weapon {
 				exception.printStackTrace();
 				SplashActivity.database.insert(this);
 			}
+		
+		if (this.equipped) {
+			PlayerSpaceship.getEquippedWeapon().setEquipped(false);
+			this.equipped = true;
+			PlayerSpaceship.setEquippedWeapon(this);
+		}
 	}
 	
 	/**
@@ -345,7 +377,7 @@ public class Weapon {
 			}
 		}
 		
-		if (i == weapons.size())
+		if (i == weapons.size() && weapons.size() < 4)
 			weapons.add(this);
 		
 		if (!ignored)
@@ -358,6 +390,12 @@ public class Weapon {
 				exception.printStackTrace();
 				SplashActivity.database.insert(this);
 			}
+		
+		if (this.equipped) {
+			PlayerSpaceship.getEquippedWeapon().setEquipped(false);
+			this.equipped = true;
+			PlayerSpaceship.setEquippedWeapon(this);
+		}
 	}
 	
 	/**
@@ -565,7 +603,14 @@ public class Weapon {
 	public void setEquipped (boolean equipped) {
 		if (!owned)
 			throw new AssertionError("can't equip if not owned");
+		
+		if (PlayerSpaceship.getEquippedWeapon() != null) {
+			PlayerSpaceship.getEquippedWeapon().equipped = false;
+			SplashActivity.database.update(PlayerSpaceship.getEquippedWeapon());
+		}
+		
 		this.equipped = equipped;
+		PlayerSpaceship.setEquippedWeapon(this);
 		SplashActivity.database.update(this);
 	}
 	
@@ -660,7 +705,8 @@ public class Weapon {
 	 * @see com.example.spaceship.classes.Weapon#equipped
 	 */
 	
-	private void log (long id, String name, int damage, int speed, int price, boolean owned, boolean equipped, boolean ignored) {
+	private void log (long id, String name, int damage, int speed, int price, boolean owned,
+	                  boolean equipped, boolean ignored) {
 		Log.d("Weapon#constructor",
 		      String.format((ignored ? "IGNORED" : "") + "Constructor: All\n" +
 		                    "ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s\n" +
