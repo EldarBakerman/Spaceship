@@ -127,7 +127,7 @@ public class EnemySpaceship extends Spaceship {
 	 * @see com.example.spaceship.classes.EnemySpaceship#rarity
 	 */
 	
-	public void setRarity (int rarity) {
+	public void setRarity (@IntRange(from = 1, to = 3) int rarity) {
 		this.rarity = rarity;
 	}
 	
@@ -143,7 +143,8 @@ public class EnemySpaceship extends Spaceship {
 	 * @see com.example.spaceship.classes.EnemySpaceship.EnemyType
 	 */
 	
-	public int getType () {
+	public @IntRange(from = 1, to = 4)
+	int getType () {
 		return type;
 	}
 	

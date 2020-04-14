@@ -103,9 +103,9 @@ public class StoreActivity extends AppCompatActivity {
 					               Toast.LENGTH_LONG).show();
 			else if (!weapon.isEquipped()) {
 				if (!weapon.isOwned())
-					Log.d("Store", "This should never happen wtf");
+					Log.d("Store", "!equipped && !owned");
 				
-				Log.d("Store", "Apparently I'm here now");
+				Log.d("Store", "!weapon.isEquipped()");
 				weapon.log(this.getClass());
 				
 				Weapon equippedWeapon = PlayerSpaceship.getEquippedWeapon();
@@ -153,7 +153,7 @@ public class StoreActivity extends AppCompatActivity {
 		if (weapon == null)
 			for (Weapon w : Weapon.weapons)
 				if (w.isEquipped())
-					PlayerSpaceship.setEquippedWeapon(w);
+					w.setEquipped(true);
 		
 		int i;
 		for (i = 0; i < Weapon.weapons.size(); i++)

@@ -13,7 +13,7 @@ import com.example.spaceship.classes.User;
 
 import java.util.Locale;
 
-public class UserActivity extends AppCompatActivity {
+public class AccountActivity extends AppCompatActivity {
 	
 	EditText username;
 	TextView points;
@@ -69,8 +69,8 @@ public class UserActivity extends AppCompatActivity {
 			user.setName("");
 			user.setHighscore(0);
 			user.setPoints(0);
-			UserActivity.this.getIntent().removeExtra("userId");
-			UserActivity.this.finish();
+			AccountActivity.this.getIntent().removeExtra("userId");
+			AccountActivity.this.finish();
 			System.exit(2); // 2 - User Invalid
 		});
 	}

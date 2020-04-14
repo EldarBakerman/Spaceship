@@ -268,7 +268,9 @@ public class Weapon {
 		}
 		
 		SplashActivity.database.update(this);
-		SplashActivity.database.update(PlayerSpaceship.getEquippedWeapon());
+		
+		if (PlayerSpaceship.getEquippedWeapon() != null)
+			SplashActivity.database.update(PlayerSpaceship.getEquippedWeapon());
 	}
 	
 	/**
@@ -300,7 +302,7 @@ public class Weapon {
 		
 		if (!ignored)
 			try {
-				SplashActivity.database.deleteWeapon(this.id);
+				SplashActivity.database.deleteWeapon(this.name);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

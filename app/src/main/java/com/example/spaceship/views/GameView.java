@@ -343,6 +343,7 @@ public class GameView extends View {
 		player.updateWeapon();
 		hbFill   = new Paint();
 		hbStroke = new Paint();
+		player.getWeapon().log(this.getClass());
 		
 		// Layout
 		
@@ -398,7 +399,6 @@ public class GameView extends View {
 		// Player & Player Healthbar
 		
 		dPlayer = player.getImage();
-		player.getWeapon().setImage(getResources().getDrawable(R.drawable.red_laser, null));
 		
 		// Laser
 		laser = player.getWeapon().getImage();
@@ -453,18 +453,28 @@ public class GameView extends View {
 	private void explode (Spaceship spaceship) {
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
+			// Counts how many times the timer has executed
 			int timerCount = 0;
 			
+			// Timer method
 			@Override
 			public void run () {
+				// If the stage is below 3, execute setExplosion()
 				if (timerCount < 3)
 					spaceship.setExplosion(getRes("explosion" + timerCount), timerCount);
 				else {
+					// If the stage is above or equals to 3, execute setExplosion() & cancel the
+					// timer
 					spaceship.setExplosion(timerCount);
 					timer.cancel();
+					
+					// If the spaceship is a PlayerSpaceship -> The player has exploded -> lost =
+					// true
 					if (spaceship instanceof PlayerSpaceship) {
 						lost = true;
 					}
+					
+					// Reset the hit
 					hit = null;
 					invalidate();
 				}
@@ -474,6 +484,9 @@ public class GameView extends View {
 		}, 0, 300);
 		
 		if (spaceship instanceof EnemySpaceship) {
+			
+			// If the exploded spaceship is an enemy -> Add points to the user and update them in
+			// the TextView
 			points += SPACESHIP_POINTS;
 			userPoints += SPACESHIP_POINTS;
 			pointsText.setText(String.format(Locale.ENGLISH,
@@ -1067,18 +1080,32 @@ public class GameView extends View {
 		final int height = Math.abs(bounds.height());
 		ValueAnimator animator;
 		
+		
+		// Checks if it's a miss or a hit to select the target of the laser (if miss - the end of
+		// the screen)
 		hit = laserTarget();
 		if (hit == null) {
+			
+			// Sets the duration of the animation to the weapon's speed * 100 (if misses)
 			animator = ValueAnimator.ofInt(bounds.top, -1 * height);
 			animator.setDuration(player.getWeapon().getSpeed() * 100);
 			miss = true;
 		} else {
+			/* Sets the duration to a relation between the distance from the target and the speed:
+			 * speed * 100 / height of screen / target's bottom position.
+			 *
+			 * Since we  cannot directly set the speed of the laser, we have to use the time =
+			 * distance / speed formula to calculate the required duration to always stay in the
+			 * same speed by using the distance.
+			 */
+			
 			final Rect targetBounds = Objects.requireNonNull(laserTarget()).getImage().getBounds();
 			animator = ValueAnimator.ofInt(bounds.top, targetBounds.bottom);
 			animator.setDuration((int) ((float) (player.getWeapon().getSpeed() * 100) /
 			                            ((float) getHeight() / (float) targetBounds.bottom)));
 		}
 		
+		// Animates the laser by changing its bottom and top values.
 		animator.addUpdateListener(animation -> {
 			final Object animatedValue = animation.getAnimatedValue();
 			laser.setBounds(bounds.left,

@@ -13,7 +13,7 @@
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
 		<activity
-			android:name=".activities.UserActivity"
+			android:name=".activities.AccountActivity"
 			android:launchMode="singleTask" />
 		<activity
 			android:name=".activities.StoreActivity"

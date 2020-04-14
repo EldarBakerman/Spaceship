@@ -476,6 +476,7 @@ public class Spaceship {
 	 */
 	
 	public void setExplosion (int stage) {
+		// Check if the stage is valid
 		if (stage > 3 || this.explosion == null) {
 			this.stage = -1;
 			return;
@@ -490,21 +491,29 @@ public class Spaceship {
 		
 		switch (stage) {
 			case 0:
+				// First Stage
+				// Set the size of the explosion to one quarter of the spaceship's size
 				this.explosion.setBounds(bounds.centerX() - (width / 4),
 				                         bounds.centerY() - (height / 4),
 				                         bounds.centerX() + (width / 4),
 				                         bounds.centerY() + height / 4);
 				break;
 			case 1:
+				// Second Stage
+				// Set the size of the explosion to one third of the spaceship's size
 				this.explosion.setBounds(bounds.centerX() - (width / 3),
 				                         bounds.centerY() - (height / 3),
 				                         bounds.centerX() + (width / 3),
 				                         bounds.centerY() + height / 3);
 				break;
 			case 2:
+				// Third Stage
+				// Set the size of the explosion to the spaceship's size
 				this.explosion.setBounds(bounds);
 				break;
 			case 3:
+				// Fourth and Last Stage
+				// Sets the explosion to invisible and nullifies the spaceship and all its fields.
 				this.image.setBounds(0, 0, 0, 0);
 				this.explosion.setBounds(0, 0, 0, 0);
 				this.healthbar.setEmpty();

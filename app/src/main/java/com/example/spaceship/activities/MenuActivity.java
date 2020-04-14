@@ -29,7 +29,7 @@ public class MenuActivity extends AppCompatActivity {
 	}
 	
 	public void startUser (View view) {
-		final Intent intent = new Intent(MenuActivity.this, UserActivity.class);
+		final Intent intent = new Intent(MenuActivity.this, AccountActivity.class);
 		intent.putExtra("userId", getIntent().getLongExtra("userId", -1));
 		startActivity(intent);
 	}
