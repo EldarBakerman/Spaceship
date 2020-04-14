@@ -177,17 +177,20 @@ public class PlayerSpaceship extends Spaceship {
 	 * the
 	 * new {@link com.example.spaceship.classes.Weapon weapon}.
 	 *
-	 * @param equippedWeapon the new static {@link com.example.spaceship.classes.Weapon weapon}.
+	 * @param weapon the new static {@link com.example.spaceship.classes.Weapon weapon}.
 	 *
 	 * @see com.example.spaceship.classes.PlayerSpaceship#equippedWeapon
 	 * @see com.example.spaceship.classes.Weapon
 	 */
 	
-	public static void setEquippedWeapon (Weapon equippedWeapon) {
-		if (!equippedWeapon.isOwned())
-			throw new AssertionError("weapon isn't owned");
+	public static void setEquippedWeapon (Weapon weapon) {
+		if (!weapon.isOwned())
+			throw new AssertionError("weapon is not owned");
 		
-		PlayerSpaceship.equippedWeapon = equippedWeapon;
+		if (!weapon.isEquipped())
+			throw new AssertionError("weapon is not equipped");
+		
+		equippedWeapon = weapon;
 	}
 	
 	/**
@@ -218,9 +221,10 @@ public class PlayerSpaceship extends Spaceship {
 			throw new AssertionError("weapon isn't owned");
 		
 		this.weapon.setEquipped(false);
+		equippedWeapon.setEquipped(false);
 		this.weapon = weapon;
 		this.weapon.setEquipped(true);
-		PlayerSpaceship.equippedWeapon = this.weapon;
+		equippedWeapon = weapon;
 	}
 	
 	/**
@@ -233,6 +237,7 @@ public class PlayerSpaceship extends Spaceship {
 	 */
 	
 	public void updateWeapon () {
-		this.setWeapon(equippedWeapon);
+		this.weapon = equippedWeapon;
 	}
+	
 }

@@ -1,6 +1,7 @@
 package com.example.spaceship.activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -69,6 +70,7 @@ public class StoreActivity extends AppCompatActivity {
 		
 		pointsText = findViewById(R.id.points);
 		
+		
 		User user = SplashActivity.database.getUser(getSharedPreferences("Splash",
 		                                                                 MODE_PRIVATE).getLong(
 				"userId",
@@ -81,7 +83,7 @@ public class StoreActivity extends AppCompatActivity {
 		
 		weapons.setOnItemClickListener((parent, view, position, id) -> {
 			final Weapon weapon = Weapon.weapons.get(position);
-			if (weapon.isOwned() && weapon.isEquipped())
+			if (weapon.isEquipped())
 				return;
 			
 			Button buyBtn = view.findViewById(R.id.buy);
@@ -100,10 +102,22 @@ public class StoreActivity extends AppCompatActivity {
 					               "You do not have enough points to purchase this weapon",
 					               Toast.LENGTH_LONG).show();
 			else if (!weapon.isEquipped()) {
-				final Weapon equippedWeapon = PlayerSpaceship.getEquippedWeapon();
+				if (!weapon.isOwned())
+					Log.d("Store", "This should never happen wtf");
+				
+				Log.d("Store", "Apparently I'm here now");
+				weapon.log(this.getClass());
+				
+				Weapon equippedWeapon = PlayerSpaceship.getEquippedWeapon();
 				int pos = getPos();
+				
+				if (equippedWeapon == null)
+					equippedWeapon = Weapon.weapons.get(pos);
+				
+				equippedWeapon.log(this.getClass());
 				equippedWeapon.setEquipped(false);
 				Weapon.weapons.get(pos).setEquipped(false);
+				weapon.setEquipped(true);
 				
 				weapons.setItemChecked(pos, true);
 				View prevWeapon = getViewByPosition(pos, weapons);
@@ -112,10 +126,12 @@ public class StoreActivity extends AppCompatActivity {
 				                                   equippedWeapon,
 				                                   prevWeapon.findViewById(R.id.buy));
 				
-				weapon.setEquipped(true);
-				PlayerSpaceship.setEquippedWeapon(weapon);
+				weapons.setItemChecked(pos, false);
 			}
+			
+			weapons.setItemChecked(position, true);
 			StoreWeaponAdapter.setButtonFormat(view.getResources(), weapon, buyBtn);
+			weapons.setItemChecked(position, false);
 		});
 	}
 	
@@ -139,10 +155,14 @@ public class StoreActivity extends AppCompatActivity {
 				if (w.isEquipped())
 					PlayerSpaceship.setEquippedWeapon(w);
 		
-		for (int i = 0; i < Weapon.weapons.size(); i++)
+		int i;
+		for (i = 0; i < Weapon.weapons.size(); i++)
 			if (weapon != null && weapon.getName().equals(Weapon.weapons.get(i).getName()))
 				return i;
-		return -1;
+		
+		Weapon.setDefault();
+		final int indexOf = Weapon.weapons.indexOf(PlayerSpaceship.getEquippedWeapon());
+		return Math.max(indexOf, 0); // <==> indexOf > -1 ? indexOf : 0;
 	}
 	
 	/**
@@ -154,7 +174,7 @@ public class StoreActivity extends AppCompatActivity {
 	 * @param listView the list from which the view is retrieved.
 	 *
 	 * @return the {@link android.view.View view} in the
-	 * {@link com.example.spaceship.activities.StoreActivity#weapons}
+	 *        {@link com.example.spaceship.activities.StoreActivity#weapons}
 	 * 		list by its position.
 	 *
 	 * @see com.example.spaceship.activities.StoreActivity#weapons

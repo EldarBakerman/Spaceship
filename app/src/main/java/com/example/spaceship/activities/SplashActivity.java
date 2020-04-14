@@ -49,6 +49,10 @@ public class SplashActivity extends AppCompatActivity {
 				}
 				database.insert(weapon);
 			}
+		else
+			for (int i = 0; i < Weapon.weapons.size(); i++)
+			     Weapon.weapons.set(i, database.getAllWeapons().get(i));
+			
 		Log.d("SplashActivity#create",
 		      "Size: " + Objects.requireNonNull(database.getAllWeapons()).size());
 		

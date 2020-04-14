@@ -31,7 +31,6 @@ public class Weapon {
 			WEAPON_0 = new Weapon("Default", 5, 2, 0, false);
 			WEAPON_0.setOwned(true);
 			WEAPON_0.setEquipped(true);
-			PlayerSpaceship.setEquippedWeapon(WEAPON_0);
 			WEAPON_1 = new Weapon("Prism", 8, 3, 25, false);
 			WEAPON_2 = new Weapon("Finisher", 12, 1, 50, false);
 			WEAPON_3 = new Weapon("Purity", 15, 2, 100, false);
@@ -182,7 +181,7 @@ public class Weapon {
 				exception.printStackTrace();
 			} catch (Exception exception) {
 				exception.printStackTrace();
-				Log.d("Weapon#database",
+				Log.d("Weapon#all",
 				      String.format(Locale.ENGLISH,
 				                    "Could not find Weapon %s with ID %d",
 				                    this.name,
@@ -195,6 +194,11 @@ public class Weapon {
 			this.equipped = true;
 			PlayerSpaceship.setEquippedWeapon(this);
 		}
+		
+		SplashActivity.database.update(this);
+		
+		if (PlayerSpaceship.getEquippedWeapon() != null)
+			SplashActivity.database.update(PlayerSpaceship.getEquippedWeapon());
 	}
 	
 	/**
@@ -242,14 +246,29 @@ public class Weapon {
 			weapons.add(this);
 		
 		if (!ignored)
-			if (SplashActivity.database != null)
-				this.id = SplashActivity.database.insert(this).id;
+			try {
+				SplashActivity.database.getWeapon(this.name);
+				SplashActivity.database.update(this);
+			} catch (NullPointerException exception) {
+				exception.printStackTrace();
+			} catch (Exception exception) {
+				exception.printStackTrace();
+				Log.d("Weapon#basic",
+				      String.format(Locale.ENGLISH,
+				                    "Could not find Weapon %s with ID %d",
+				                    this.name,
+				                    this.id));
+				SplashActivity.database.insert(this);
+			}
 		
 		if (this.equipped) {
 			PlayerSpaceship.getEquippedWeapon().setEquipped(false);
 			this.equipped = true;
 			PlayerSpaceship.setEquippedWeapon(this);
 		}
+		
+		SplashActivity.database.update(this);
+		SplashActivity.database.update(PlayerSpaceship.getEquippedWeapon());
 	}
 	
 	/**
@@ -313,6 +332,11 @@ public class Weapon {
 				exception.printStackTrace();
 			} catch (Exception exception) {
 				exception.printStackTrace();
+				Log.d("Weapon#basicImage",
+				      String.format(Locale.ENGLISH,
+				                    "Could not find Weapon %s with ID %d",
+				                    this.name,
+				                    this.id));
 				SplashActivity.database.insert(this);
 			}
 		
@@ -321,6 +345,11 @@ public class Weapon {
 			this.equipped = true;
 			PlayerSpaceship.setEquippedWeapon(this);
 		}
+		
+		SplashActivity.database.update(this);
+		
+		if (PlayerSpaceship.getEquippedWeapon() != null)
+			SplashActivity.database.update(PlayerSpaceship.getEquippedWeapon());
 	}
 	
 	/**
@@ -388,6 +417,11 @@ public class Weapon {
 				exception.printStackTrace();
 			} catch (Exception exception) {
 				exception.printStackTrace();
+				Log.d("Weapon#weapon",
+				      String.format(Locale.ENGLISH,
+				                    "Could not find Weapon %s with ID %d",
+				                    this.name,
+				                    this.id));
 				SplashActivity.database.insert(this);
 			}
 		
@@ -396,6 +430,23 @@ public class Weapon {
 			this.equipped = true;
 			PlayerSpaceship.setEquippedWeapon(this);
 		}
+		
+		SplashActivity.database.update(this);
+		
+		if (PlayerSpaceship.getEquippedWeapon() != null)
+			SplashActivity.database.update(PlayerSpaceship.getEquippedWeapon());
+	}
+	
+	/**
+	 * Sets the equipped weapon to {@link com.example.spaceship.classes.Weapon#WEAPON_0}.
+	 *
+	 * @see com.example.spaceship.classes.Weapon#setEquipped(boolean)
+	 * @see com.example.spaceship.classes.Weapon#WEAPON_0
+	 */
+	
+	public static void setDefault () {
+		WEAPON_0.log(Weapon.class);
+		WEAPON_0.setEquipped(true);
 	}
 	
 	/**
@@ -572,8 +623,7 @@ public class Weapon {
 	 */
 	
 	public void setOwned (boolean owned) {
-		this.owned    = owned;
-		this.equipped = owned && this.equipped;
+		this.owned = owned;
 		SplashActivity.database.update(this);
 	}
 	
@@ -604,13 +654,32 @@ public class Weapon {
 		if (!owned)
 			throw new AssertionError("can't equip if not owned");
 		
-		if (PlayerSpaceship.getEquippedWeapon() != null) {
-			PlayerSpaceship.getEquippedWeapon().equipped = false;
-			SplashActivity.database.update(PlayerSpaceship.getEquippedWeapon());
-		}
+		Weapon equippedWeapon = PlayerSpaceship.getEquippedWeapon();
+		
+		if (equippedWeapon != null)
+			equippedWeapon.equipped = false;
+		
+		for (Weapon weapon : Weapon.weapons)
+			if (weapon.equipped)
+				weapon.equipped = false;
 		
 		this.equipped = equipped;
-		PlayerSpaceship.setEquippedWeapon(this);
+		
+		if (equipped)
+			PlayerSpaceship.setEquippedWeapon(this);
+		else
+			setDefault();
+		
+		if (equippedWeapon != null) {
+			SplashActivity.database.update(equippedWeapon);
+		}
+		Log.d("setEquipped",
+		      String.format(Locale.ENGLISH,
+		                    "Equipped: %s with ID: %d; Weapon: %s " + "with ID: %d",
+		                    equippedWeapon != null ? equippedWeapon.name : "null",
+		                    -1,
+		                    this.name,
+		                    this.id));
 		SplashActivity.database.update(this);
 	}
 	
@@ -707,8 +776,8 @@ public class Weapon {
 	
 	private void log (long id, String name, int damage, int speed, int price, boolean owned,
 	                  boolean equipped, boolean ignored) {
-		Log.d("Weapon#constructor",
-		      String.format((ignored ? "IGNORED" : "") + "Constructor: All\n" +
+		Log.d("Weapon#constructor", String.format((ignored ? "IGNORED" : "") + "Constructor: " +
+		                                          "All\n" +
 		                    "ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s\n" +
 		                    "Params: ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s",
 		                    this.id,
@@ -793,5 +862,18 @@ public class Weapon {
 		                    weapon.price,
 		                    weapon.owned,
 		                    weapon.equipped));
+	}
+	
+	public void log (Class c) {
+		Log.d(c.getName(),
+		      String.format("Constructor: Weapon\n" +
+		                    "ID: %d NAME: %s DMG: %d SPD: %d PRC: %d OWN: %s EQP: %s",
+		                    this.id,
+		                    this.name,
+		                    this.damage,
+		                    this.speed,
+		                    this.price,
+		                    this.owned,
+		                    this.equipped));
 	}
 }

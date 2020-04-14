@@ -339,7 +339,8 @@ public class GameView extends View {
 		
 		// Player
 		
-		player   = new PlayerSpaceship(getResources().getDrawable(R.drawable.spaceship1, null));
+		player = new PlayerSpaceship(getResources().getDrawable(R.drawable.spaceship1, null));
+		player.updateWeapon();
 		hbFill   = new Paint();
 		hbStroke = new Paint();
 		
@@ -915,8 +916,10 @@ public class GameView extends View {
 							                PREV_BOTTOM_MARGIN + HEIGHT);
 						break;
 					case 5:
-						image.setBounds(RIGHT_MARGIN_EDGE - WIDTH, PREV_BOTTOM,
-						                RIGHT_MARGIN_EDGE, PREV_BOTTOM + HEIGHT);
+						image.setBounds(RIGHT_MARGIN_EDGE - WIDTH,
+						                PREV_BOTTOM,
+						                RIGHT_MARGIN_EDGE,
+						                PREV_BOTTOM + HEIGHT);
 						break;
 				}
 			}
