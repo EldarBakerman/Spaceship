@@ -32,6 +32,7 @@ import com.example.spaceship.classes.EnemySpaceship;
 import com.example.spaceship.classes.PlayerSpaceship;
 import com.example.spaceship.classes.Spaceship;
 import com.example.spaceship.classes.User;
+import com.example.spaceship.classes.Weapon;
 
 import java.lang.reflect.Field;
 import java.util.Locale;
@@ -983,13 +984,19 @@ public class GameView extends View {
 	 */
 	
 	private void initLaser () {
+		if (laser == null)
+			if (player.getWeapon() == null)
+				player.setWeapon(Weapon.weapons.get(0));
+			else
+				player.getWeapon().setImage(getRes("red_laser"));
+		
 		final Rect bounds = dPlayer.getBounds();
 		laser.setBounds(bounds.centerX() - 30,
 		                bounds.top - 110,
 		                bounds.centerX() + 30,
 		                bounds.top - 10);
 	}
-	
+	// Yay I'm a failure
 	/**
 	 * Calculates the {@link com.example.spaceship.classes.EnemySpaceship spaceship} that the laser
 	 * hits and returns that {@link com.example.spaceship.classes.EnemySpaceship spaceship}.
