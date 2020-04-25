@@ -29,6 +29,7 @@ import com.example.spaceship.R;
 import com.example.spaceship.activities.GameActivity;
 import com.example.spaceship.activities.SplashActivity;
 import com.example.spaceship.classes.EnemySpaceship;
+import com.example.spaceship.classes.MusicService;
 import com.example.spaceship.classes.PlayerSpaceship;
 import com.example.spaceship.classes.Spaceship;
 import com.example.spaceship.classes.User;
@@ -338,6 +339,11 @@ public class GameView extends View {
 		userPoints = user.getPoints();
 		points     = activity.getIntent().getIntExtra("points", 0);
 		
+		// Music
+		
+		Intent musicService = new Intent(context, MusicService.class);
+		context.startService(musicService);
+		
 		// Player
 		
 		player = new PlayerSpaceship(getResources().getDrawable(R.drawable.spaceship1, null));
@@ -643,7 +649,6 @@ public class GameView extends View {
 		if (battery != null) {
 			battery.setBounds(getWidth() - 200, 90, getWidth() - 100, 190);
 			battery.draw(canvas);
-			final Rect bounds = battery.getBounds();
 		} else {
 			Log.d("GameView#onDraw", "Battery null");
 		}
@@ -984,11 +989,16 @@ public class GameView extends View {
 	 */
 	
 	private void initLaser () {
-		if (laser == null)
-			if (player.getWeapon() == null)
-				player.setWeapon(Weapon.weapons.get(0));
-			else
-				player.getWeapon().setImage(getRes("red_laser"));
+		if (laser == null) {
+			final Weapon weapon = player.getWeapon();
+			if (weapon == null)
+				player.setWeapon(Objects.requireNonNull(Weapon.weapons.get(0)));
+			
+			if (Objects.requireNonNull(weapon).getImage() == null)
+				weapon.setImage(getRes("red_laser"));
+			
+			laser = weapon.getImage();
+		}
 		
 		final Rect bounds = dPlayer.getBounds();
 		laser.setBounds(bounds.centerX() - 30,
@@ -997,6 +1007,7 @@ public class GameView extends View {
 		                bounds.top - 10);
 	}
 	// Yay I'm a failure
+	
 	/**
 	 * Calculates the {@link com.example.spaceship.classes.EnemySpaceship spaceship} that the laser
 	 * hits and returns that {@link com.example.spaceship.classes.EnemySpaceship spaceship}.
